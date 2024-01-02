@@ -1,0 +1,55 @@
+name: "Workabotic"
+description: "From science to engineering, from electronics to robotics, from hardware to software"
+keywords: "engineering, electrical, electronics, microcontrollers, microprocessors, processors, robotics, automation, programming, artificial intelligence, machine learning, AI, C, C++, Python, DIY, Do It Yourself"
+highlighter: rouge
+markdown: kramdown
+kramdown:
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true
+
+paginate: 10
+baseurl:
+domain_name: 'http://workabotic.com'
+url: 'https://workabotic.github.io'
+disqus: true
+disqus_shortname: 'workabotic'
+google_analytics: 'G-0BL99CM14H'
+x: workabotic
+github: workabotic
+plugins: 
+    - jekyll-paginate
+    - jekyll-sitemap
+
+authors:
+    lucasmazzetto:
+        name: Lucas Mazzetto
+        ocupation: Electrical Engineer
+        about: Technology enthusiast. Passionate about science, computers, machines, and robots.
+        avatar: lucasmazzetto
+        x: lucasmazz
+        github: lucasmazzetto
+        linkedin: lucasmazzetto
+        site:
+        
+permalink: /:year/:title/
+
+defaults:
+    -
+        scope:
+            path: "" # empty string for all files
+            type: pages
+        values:
+            layout: default
+    -
+        scope:
+            path: "" # empty string for all files
+            type: posts
+        values:
+            layout: post
+    -
+        scope:
+            path: ""
+            type: drafts
+        values:
+            layout: post

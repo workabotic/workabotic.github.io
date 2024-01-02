@@ -1,0 +1,105 @@
+section .bss
+    num1 resb 4             ; Reserve 4 bytes for the first number
+    num2 resb 4             ; Reserve 4 bytes for the second number
+    result resb 8           ; Reserve 8 bytes for the result
+
+section .data
+    prompt1 db 'Enter first number: ', 0
+    prompt1_len equ $ - prompt1
+    prompt2 db 'Enter second number: ', 0
+    prompt2_len equ $ - prompt2
+    result_msg db 'Result: ', 0
+    result_msg_len equ $ - result_msg
+    newline db 10, 0       ; Newline character
+
+section .text
+    global _start
+
+_start:
+    ; Print first prompt
+    mov eax, 4             ; sys_write system call number
+    mov ebx, 1             ; File descriptor 1 (stdout)
+    mov ecx, prompt1       ; Pointer to the prompt string
+    mov edx, prompt1_len   ; Length of the prompt string
+    int 0x80               ; Call kernel
+
+    ; Read first number
+    mov eax, 3             ; sys_read system call number
+    mov ebx, 0             ; File descriptor 0 (stdin)
+    mov ecx, num1          ; Pointer to the input buffer
+    mov edx, 4             ; Number of bytes to read
+    int 0x80               ; Call kernel
+
+    ; Print second prompt
+    mov eax, 4             ; sys_write system call number
+    mov ebx, 1             ; File descriptor 1 (stdout)
+    mov ecx, prompt2       ; Pointer to the prompt string
+    mov edx, prompt2_len   ; Length of the prompt string
+    int 0x80               ; Call kernel
+
+    ; Read second number
+    mov eax, 3             ; sys_read system call number
+    mov ebx, 0             ; File descriptor 0 (stdin)
+    mov ecx, num2          ; Pointer to the input buffer
+    mov edx, 4             ; Number of bytes to read
+    int 0x80               ; Call kernel
+
+    ; Convert ASCII to integer
+    mov ecx, num1
+    call atoi
+    mov ebx, eax           ; Store first number in ebx
+
+    mov ecx, num2
+    call atoi
+    add eax, ebx           ; Add first number to second number
+
+    ; Convert result to ASCII
+    mov ecx, result
+    call itoa
+
+    ; Print result message
+    mov eax, 4             ; sys_write system call number
+    mov ebx, 1             ; File descriptor 1 (stdout)
+    mov ecx, result_msg    ; Pointer to the result message
+    mov edx, result_msg_len; Length of the result message
+    int 0x80               ; Call kernel
+
+    ; Print result
+    mov eax, 4             ; sys_write system call number
+    mov ebx, 1             ; File descriptor 1 (stdout)
+    mov ecx, result        ; Pointer to the result buffer
+    mov edx, 8             ; Number of bytes to write
+    int 0x80               ; Call kernel
+
+    ; Exit the program
+    mov eax, 1             ; sys_exit system call number
+    xor ebx, ebx           ; Exit code 0
+    int 0x80               ; Call kernel
+
+; Function to convert ASCII to integer
+atoi:
+    xor eax, eax           ; Clear eax
+    xor ebx, ebx           ; Clear ebx
+atoi_loop:
+    mov bl, byte [ecx]
+    cmp bl, 10             ; Newline
+    je atoi_done
+    sub bl, 30h            ; Convert ASCII to integer
+    imul eax, eax, 10
+    add eax, ebx
+    inc ecx
+    jmp atoi_loop
+atoi_done:
+    ret
+
+; Function to convert integer to ASCII
+itoa:
+    mov ebx, 10            ; Divisor
+    xor edx, edx           ; Clear edx
+    div ebx
+    add dl, 30h            ; Convert to ASCII
+    mov [ecx], dl
+    inc ecx
+    cmp eax, 0
+    jne itoa
+    ret

@@ -1,0 +1,22 @@
+class TemperatureConverter:
+    def __init__(self, celsius=0):
+        self.celsius = celsius
+
+    def to_fahrenheit(self):
+        return (self.celsius * 9/5) + 32
+
+    def from_fahrenheit(self, fahrenheit):
+        self.celsius = (fahrenheit - 32) * 5/9
+        return self.celsius
+
+    def __str__(self):
+        return f"{self.celsius}°C / {self.to_fahrenheit()}°F"
+    
+def main():
+    temp = TemperatureConverter(25)
+    print(temp)
+    temp.from_fahrenheit(77)
+    print(temp)
+
+if __name__ == "__main__":
+    main()

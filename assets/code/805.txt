@@ -1,0 +1,32 @@
+class Airplane:
+    def __init__(self, model, capacity):
+        self.model = model
+        self.capacity = capacity
+        self.current_passengers = 0
+
+    def board_passengers(self, number):
+        if self.current_passengers + number <= self.capacity:
+            self.current_passengers += number
+            print(f"{number} passengers boarded. Current load: {self.current_passengers}/{self.capacity}")
+        else:
+            print("Not enough room for more passengers.")
+
+    def disembark_passengers(self, number):
+        if self.current_passengers >= number:
+            self.current_passengers -= number
+            print(f"{number} passengers disembarked. Current load: {self.current_passengers}/{self.capacity}")
+        else:
+            print("Not enough passengers to disembark.")
+
+    def __str__(self):
+        return f"Airplane(model={self.model}, capacity={self.capacity}, current_passengers={self.current_passengers})"
+
+def main():
+    airplane = Airplane("Boeing 747", 300)
+    print(airplane)
+    airplane.board_passengers(150)
+    airplane.disembark_passengers(50)
+    print(airplane)
+
+if __name__ == "__main__":
+    main()

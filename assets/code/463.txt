@@ -1,0 +1,76 @@
+#include <stdio.h>
+
+#define MAX 10
+
+// Function prototypes
+void multiplyMatrices(int first[MAX][MAX], int second[MAX][MAX], int result[MAX][MAX], int rowFirst, int columnFirst, int rowSecond, int columnSecond);
+void printMatrix(int matrix[MAX][MAX], int row, int column);
+
+int main() {
+    int first[MAX][MAX], second[MAX][MAX], result[MAX][MAX];
+    int rowFirst, columnFirst, rowSecond, columnSecond;
+
+    // Input dimensions and matrices
+    printf("Enter rows and columns for first matrix: ");
+    scanf("%d %d", &rowFirst, &columnFirst);
+    printf("Enter rows and columns for second matrix: ");
+    scanf("%d %d", &rowSecond, &columnSecond);
+
+    // Check if multiplication is possible
+    if (columnFirst != rowSecond) {
+        printf("Error! column of first matrix should be equal to row of second.\n");
+        return 1;
+    }
+
+    printf("Enter elements of matrix 1:\n");
+    for (int i = 0; i < rowFirst; i++) {
+        for (int j = 0; j < columnFirst; j++) {
+            scanf("%d", &first[i][j]);
+        }
+    }
+
+    printf("Enter elements of matrix 2:\n");
+    for (int i = 0; i < rowSecond; i++) {
+        for (int j = 0; j < columnSecond; j++) {
+            scanf("%d", &second[i][j]);
+        }
+    }
+
+    // Multiply matrices
+    multiplyMatrices(first, second, result, rowFirst, columnFirst, rowSecond, columnSecond);
+
+    // Print result
+    printf("Product of the matrices:\n");
+    printMatrix(result, rowFirst, columnSecond);
+
+    return 0;
+}
+
+// Function to multiply two matrices
+void multiplyMatrices(int first[MAX][MAX], int second[MAX][MAX], int result[MAX][MAX], int rowFirst, int columnFirst, int rowSecond, int columnSecond) {
+    // Initialize result matrix to 0
+    for (int i = 0; i < rowFirst; i++) {
+        for (int j = 0; j < columnSecond; j++) {
+            result[i][j] = 0;
+        }
+    }
+
+    // Perform matrix multiplication
+    for (int i = 0; i < rowFirst; i++) {
+        for (int j = 0; j < columnSecond; j++) {
+            for (int k = 0; k < columnFirst; k++) {
+                result[i][j] += first[i][k] * second[k][j];
+            }
+        }
+    }
+}
+
+// Function to print a matrix
+void printMatrix(int matrix[MAX][MAX], int row, int column) {
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < column; j++) {
+            printf("%d ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+}

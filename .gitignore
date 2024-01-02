@@ -1,0 +1,8 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata

@@ -1,0 +1,30 @@
+class OnlineShop:
+    def __init__(self):
+        self.products = {}
+        self.orders = []
+
+    def add_product(self, name, price):
+        self.products[name] = price
+        print(f"Added product: {name} at ${price}")
+
+    def place_order(self, product_name, quantity):
+        if product_name in self.products:
+            total_price = self.products[product_name] * quantity
+            self.orders.append((product_name, quantity, total_price))
+            print(f"Order placed: {quantity} x {product_name} for ${total_price}")
+        else:
+            print(f"Product {product_name} not found.")
+
+    def __str__(self):
+        return f"OnlineShop(products={self.products}, orders={self.orders})"
+
+def main():
+    shop = OnlineShop()
+    shop.add_product("Laptop", 999.99)
+    shop.add_product("Mouse", 49.99)
+    shop.place_order("Laptop", 1)
+    shop.place_order("Mouse", 2)
+    print(shop)
+
+if __name__ == "__main__":
+    main()

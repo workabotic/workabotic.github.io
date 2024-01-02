@@ -1,0 +1,78 @@
+#include <iostream>
+#include <string>
+
+// Base class
+class Animal {
+protected:
+    std::string name;
+    int age;
+
+public:
+    // Constructor
+    Animal(const std::string& n, int a) : name(n), age(a) {}
+
+    // Method to get the name of the animal
+    std::string getName() const {
+        return name;
+    }
+
+    // Method to get the age of the animal
+    int getAge() const {
+        return age;
+    }
+
+    // Virtual method to make a sound
+    virtual void makeSound() const {
+        std::cout << "Animal makes a sound." << std::endl;
+    }
+
+    // Method to display animal information
+    void displayInfo() const {
+        std::cout << "Name: " << name << std::endl;
+        std::cout << "Age: " << age << std::endl;
+    }
+};
+
+// Derived class
+class Dog : public Animal {
+private:
+    std::string breed;
+
+public:
+    // Constructor
+    Dog(const std::string& n, int a, const std::string& b) : Animal(n, a), breed(b) {}
+
+    // Method to get the breed of the dog
+    std::string getBreed() const {
+        return breed;
+    }
+
+    // Overridden method to make a sound
+    void makeSound() const override {
+        std::cout << "Dog barks." << std::endl;
+    }
+
+    // Method to display dog's information
+    void displayInfo() const {
+        Animal::displayInfo();
+        std::cout << "Breed: " << breed << std::endl;
+    }
+};
+
+int main() {
+    // Create an Animal object
+    Animal genericAnimal("Generic Animal", 5);
+    std::cout << "Animal Info:" << std::endl;
+    genericAnimal.displayInfo();
+    genericAnimal.makeSound();
+
+    std::cout << std::endl;
+
+    // Create a Dog object
+    Dog myDog("Buddy", 3, "Golden Retriever");
+    std::cout << "Dog Info:" << std::endl;
+    myDog.displayInfo();
+    myDog.makeSound();
+
+    return 0;
+}

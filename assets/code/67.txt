@@ -1,0 +1,65 @@
+.model  tiny
+.code
+.386
+org     100h
+
+; assume: ax=0, bx=0, cx=00FFh, bp=09??h, direction flag is clear
+
+start:
+    mov     al, 13h          ; set 320x200x8 graphics mode
+    int     10h
+    push    0A000h           ; set segment register to graphics memory
+    pop     es
+
+; ax = misc, color
+; bx = size
+; cx = loop counter
+; dx = delay
+; si = direction
+; di = pen location
+; bp = color
+
+main:
+    mov     ah, 86h          ; delay 0.2 seconds
+    mov     cl, 3            ; 200000 = 30D40h (ch=0)
+    mov     dx, 0D40h
+    int     15h
+
+    sub     bl, 2            ; Size := Size - 2
+    jge     draw             ; if Size >= 0, jump to draw
+
+    mov     bl, 49           ; Size := 49
+    imul    bp, bx           ; color := Random (bh=0)
+    inc     bp
+
+draw:
+    imul    di, bx, -321      ; di := 50-Size + (50-Size)*320
+    add     di, 50*321        ; di := (50-Size)*321 + 50*321
+
+    mov     si, 6            ; set index for direction table
+    mov     ax, bp           ; Line(50-Size, 50+Size, Color)
+
+lin20:
+    imul    cx, bx, 2         ; length = Size * 2
+
+lin30:
+    stosb                    ; es:[di++] := al
+    add     di, [si+dir]      ; next pixel position
+    loop    lin30             ; cx--
+
+    dec     si
+    dec     si
+    jns     lin20
+
+    mov     ah, 01h           ; loop until keystroke
+    int     16h
+    jz      main
+
+    mov     ax, 0003h         ; restore normal text-mode screen
+    int     10h
+    ret                       ; return to DOS
+
+dir:
+    dw      -320-1, -1-1, 320-1, 1-1  ; directions: up, right, down, left
+
+end     start

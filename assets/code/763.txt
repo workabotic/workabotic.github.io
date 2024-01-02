@@ -1,0 +1,22 @@
+class SmartThermostat:
+    def __init__(self, initial_temp):
+        self.current_temp = initial_temp
+
+    def set_temperature(self, new_temp):
+        self.current_temp = new_temp
+        print(f"Temperature set to {self.current_temp}°C")
+
+    def get_temperature(self):
+        return self.current_temp
+
+    def __str__(self):
+        return f"SmartThermostat(current_temp={self.current_temp}°C)"
+
+def main():
+    thermostat = SmartThermostat(22)
+    print(thermostat)
+    thermostat.set_temperature(25)
+    print(f"Current temperature: {thermostat.get_temperature()}°C")
+
+if __name__ == "__main__":
+    main()

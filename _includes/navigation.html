@@ -1,0 +1,22 @@
+<nav class="main-nav nav {% if page.layout == 'post' %}article-nav{% else %}home-nav{% endif %}">
+  <div class="clearfix">
+    
+    {% if page.layout == 'post' %}
+    <div class="left">
+          <a href="{{ site.baseurl }}/" class="logo workabotic">Workabotic</a>
+    </div>
+    {% endif %}
+
+    <div class="right">
+      {% if page.url != "/" %}
+        <a href="{{ site.baseurl }}/"> <span class="arrow">←</span> Home </a>
+      {% endif %}
+
+      {% if page.url != "/about/" %}
+        <a href="{{ site.baseurl }}/about">About </a>
+      {% endif %}
+
+      <a href="{{ site.baseurl }}/feed.xml" target="_blank"><i class="fa fa-rss"></i></a>
+    </div>
+  </div>
+</nav>

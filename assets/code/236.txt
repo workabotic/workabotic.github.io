@@ -1,0 +1,33 @@
+.section .data
+num: .word 5           // Number to calculate factorial of
+factorial_result: .word 1 // Result will be stored here
+
+.section .text
+.global _start
+
+_start:
+    // Load the number into r0
+    ldr r0, =num
+    ldr r0, [r0]        // r0 = 5 (number to calculate factorial of)
+
+    // Initialize r1 to 1 (factorial accumulator)
+    mov r1, #1          // r1 = 1 (initial value of factorial)
+    
+    // Initialize loop counter in r2 (r0 will be used as loop counter)
+    mov r2, r0          // r2 = 5 (loop counter)
+    
+    // Factorial loop
+factorial_loop:
+    mul r1, r1, r2      // r1 = r1 * r2 (accumulate factorial)
+    subs r2, r2, #1     // r2 = r2 - 1 (decrement loop counter)
+    bne factorial_loop  // If r2 != 0, repeat loop
+
+    // Store result in memory
+    ldr r3, =factorial_result
+    str r1, [r3]        // Store the result (r1) in factorial_result
+
+    // Exit the program
+    mov r0, #0          // Exit code 0
+    mov r7, #1          // System call number for exit
+    svc 0               // Invoke system call
+

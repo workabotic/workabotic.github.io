@@ -1,0 +1,6 @@
+from PIL import Image
+
+# boxes_1.jpg is the jpg version of boxes_1.ppm
+
+im = Image.open("boxes_1.jpg")
+im.save("boxes_1v2.ppm")

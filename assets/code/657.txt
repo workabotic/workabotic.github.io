@@ -1,0 +1,61 @@
+#include <iostream>
+#include <iomanip>
+
+class BankAccount {
+private:
+    std::string accountHolder;
+    double balance;
+
+public:
+    // Constructor
+    BankAccount(const std::string& holder, double initialBalance) 
+        : accountHolder(holder), balance(initialBalance) {}
+
+    // Method to deposit money
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            std::cout << "Deposited: $" << amount << std::endl;
+        } else {
+            std::cout << "Invalid deposit amount." << std::endl;
+        }
+    }
+
+    // Method to withdraw money
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            std::cout << "Withdrew: $" << amount << std::endl;
+        } else {
+            std::cout << "Invalid withdrawal amount or insufficient funds." << std::endl;
+        }
+    }
+
+    // Method to check balance
+    void checkBalance() const {
+        std::cout << "Account holder: " << accountHolder << std::endl;
+        std::cout << "Balance: $" << std::fixed << std::setprecision(2) << balance << std::endl;
+    }
+};
+
+int main() {
+    // Create a BankAccount object
+    BankAccount myAccount("Alice Johnson", 500.00);
+
+    // Check initial balance
+    myAccount.checkBalance();
+
+    // Deposit money
+    myAccount.deposit(150.00);
+
+    // Withdraw money
+    myAccount.withdraw(100.00);
+
+    // Try to withdraw more money than available
+    myAccount.withdraw(600.00);
+
+    // Check final balance
+    myAccount.checkBalance();
+
+    return 0;
+}

@@ -1,0 +1,26 @@
+class Student:
+    def __init__(self, name):
+        self.name = name
+        self.grades = []
+
+    def add_grade(self, grade):
+        if 0 <= grade <= 100:
+            self.grades.append(grade)
+        else:
+            print("Grade must be between 0 and 100.")
+
+    def average_grade(self):
+        return sum(self.grades) / len(self.grades) if self.grades else 0
+
+    def __str__(self):
+        return f"Student: {self.name}, Average Grade: {self.average_grade():.2f}"
+
+def main():
+    student = Student("John Doe")
+    student.add_grade(85)
+    student.add_grade(90)
+    student.add_grade(78)
+    print(student)
+
+if __name__ == "__main__":
+    main()

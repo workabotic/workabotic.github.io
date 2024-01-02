@@ -1,0 +1,65 @@
+#include <iostream>
+#include <string>
+
+class BankAccount {
+private:
+    std::string accountHolder;
+    double balance;
+
+public:
+    // Constructor to initialize the account
+    BankAccount(const std::string& holder, double initialBalance) 
+        : accountHolder(holder), balance(initialBalance) {}
+
+    // Method to deposit money into the account
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            std::cout << "Deposited $" << amount << ". New balance: $" << balance << std::endl;
+        } else {
+            std::cout << "Deposit amount must be positive." << std::endl;
+        }
+    }
+
+    // Method to withdraw money from the account
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            std::cout << "Withdrew $" << amount << ". New balance: $" << balance << std::endl;
+        } else if (amount > balance) {
+            std::cout << "Insufficient funds." << std::endl;
+        } else {
+            std::cout << "Withdrawal amount must be positive." << std::endl;
+        }
+    }
+
+    // Method to check the account balance
+    double getBalance() const {
+        return balance;
+    }
+
+    // Method to display account information
+    void displayAccountInfo() const {
+        std::cout << "Account Holder: " << accountHolder << std::endl;
+        std::cout << "Balance: $" << balance << std::endl;
+    }
+};
+
+int main() {
+    // Create a BankAccount object
+    BankAccount myAccount("John Doe", 1000.0);
+
+    // Display initial account information
+    myAccount.displayAccountInfo();
+
+    // Perform some transactions
+    myAccount.deposit(500.0);
+    myAccount.withdraw(200.0);
+    myAccount.withdraw(1500.0); // Should show insufficient funds
+
+    // Display final account information
+    std::cout << "\nFinal account information:" << std::endl;
+    myAccount.displayAccountInfo();
+
+    return 0;
+}

@@ -1,0 +1,50 @@
+*        99 Bottles of Beer        04/09/2015
+BOTTLES  CSECT
+         USING  BOTTLES,R12
+         LR     R12,R15
+BEGIN    LA     R2,99              r2=99 number of bottles
+         LR     R3,R2
+LOOP     BCTR   R3,0               r3=r2-1
+         CVD    R2,DW              binary to pack decimal 
+         MVC    ZN,EDMASKN         load mask
+         ED     ZN,DW+6            pack decimal (PL2) to char (CL4)
+         CH     R2,=H'1'           if r2<>1
+         BNE    NOTONE1            then goto notone1
+         MVI    PG1+13,C' '        1 bottle
+         MVI    PG2+13,C' '        1 bottle
+NOTONE1  MVC    PG1+4(2),ZN+2      insert bottles
+         MVC    PG2+4(2),ZN+2      insert bottles
+         CVD    R3,DW              binary to pack decimal 
+         MVC    ZN,EDMASKN         load mask
+         ED     ZN,DW+6            pack decimal (PL2) to char (CL4)
+         MVC    PG4+4(2),ZN+2      insert bottles
+         WTO    MF=(E,PG1)
+         WTO    MF=(E,PG2)
+         WTO    MF=(E,PG3)
+         CH     R3,=H'1'           if r3<>1
+         BNE    NOTONE2            then goto notone2
+         MVI    PG4+13,C' '        1 bottle
+NOTONE2  LTR    R3,R3              if r3=0
+         BZ     ZERO               then goto zero
+         WTO    MF=(E,PG4)
+         B      PR5
+ZERO     WTO    MF=(E,PG4Z)
+PR5      WTO    MF=(E,PG5)
+         BCT    R2,LOOP
+RETURN   XR     R15,R15
+         BR     R14
+         CNOP   0,4
+PG1      DC     H'40',H'0',CL40'xx bottles of beer on the wall'
+PG2      DC     H'40',H'0',CL40'xx bottles of beer'
+PG3      DC     H'40',H'0',CL40'Take one down, pass it around'
+PG4      DC     H'40',H'0',CL40'xx bottles of beer on the wall'
+PG5      DC     H'40',H'0',CL40' '
+PG4Z     DC     H'40',H'0',CL40'No more bottles of beer on the wall'
+DW       DS     0D,PL8             15num
+ZN       DS     CL4
+EDMASKN  DC     X'40202120'        CL4  3num
+WTOMSG   CNOP   0,4
+         DC     H'80'              length of WTO buffer
+         DC     H'0'               must be binary zeroes
+         YREGS
+         END    BOTTLES

@@ -1,0 +1,69 @@
+#include <iostream>
+
+class Rectangle {
+private:
+    double width;
+    double height;
+
+public:
+    // Constructor to initialize the rectangle dimensions
+    Rectangle(double w, double h) : width(w), height(h) {}
+
+    // Method to set the width and height of the rectangle
+    void setDimensions(double w, double h) {
+        width = w;
+        height = h;
+    }
+
+    // Method to get the width of the rectangle
+    double getWidth() const {
+        return width;
+    }
+
+    // Method to get the height of the rectangle
+    double getHeight() const {
+        return height;
+    }
+
+    // Method to calculate and return the area of the rectangle
+    double getArea() const {
+        return width * height;
+    }
+
+    // Method to calculate and return the perimeter of the rectangle
+    double getPerimeter() const {
+        return 2 * (width + height);
+    }
+
+    // Method to check if the rectangle is a square
+    bool isSquare() const {
+        return width == height;
+    }
+
+    // Method to display the rectangle's information
+    void displayInfo() const {
+        std::cout << "Width: " << width << std::endl;
+        std::cout << "Height: " << height << std::endl;
+        std::cout << "Area: " << getArea() << std::endl;
+        std::cout << "Perimeter: " << getPerimeter() << std::endl;
+        std::cout << "Is Square: " << (isSquare() ? "Yes" : "No") << std::endl;
+    }
+};
+
+int main() {
+    // Create a Rectangle object
+    Rectangle rect(5.0, 10.0);
+
+    // Display rectangle information
+    std::cout << "Rectangle Information:" << std::endl;
+    rect.displayInfo();
+
+    // Modify the dimensions of the rectangle
+    rect.setDimensions(7.0, 7.0);
+
+    // Display updated rectangle information
+    std::cout << "\nUpdated Rectangle Information:" << std::endl;
+    rect.displayInfo();
+
+    return 0;
+}

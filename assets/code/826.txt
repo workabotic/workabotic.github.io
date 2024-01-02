@@ -1,0 +1,32 @@
+class ParkingLot:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.parked_vehicles = 0
+
+    def park_vehicle(self):
+        if self.parked_vehicles < self.capacity:
+            self.parked_vehicles += 1
+            print(f"Vehicle parked. Total parked: {self.parked_vehicles}/{self.capacity}")
+        else:
+            print("Parking lot is full.")
+
+    def retrieve_vehicle(self):
+        if self.parked_vehicles > 0:
+            self.parked_vehicles -= 1
+            print(f"Vehicle retrieved. Total parked: {self.parked_vehicles}/{self.capacity}")
+        else:
+            print("No vehicles to retrieve.")
+
+    def __str__(self):
+        return f"ParkingLot(capacity={self.capacity}, parked_vehicles={self.parked_vehicles})"
+
+def main():
+    lot = ParkingLot(50)
+    print(lot)
+    lot.park_vehicle()
+    lot.park_vehicle()
+    lot.retrieve_vehicle()
+    print(lot)
+
+if __name__ == "__main__":
+    main()

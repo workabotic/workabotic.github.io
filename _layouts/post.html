@@ -1,0 +1,49 @@
+---
+layout: default
+---
+<article class="post">
+    <header>
+        <h1>{{ page.title }}</h1>
+
+        <h2 class="headline">
+            Updated on
+              {% assign m = page.date | date: "%-m" %}
+              {% case m %}
+              {% when '1' %}January
+                {% when '2' %}February
+                {% when '3' %}March
+                {% when '4' %}April
+                {% when '5' %}May
+                {% when '6' %}June
+                {% when '7' %}July
+                {% when '8' %}August
+                {% when '9' %}September
+                {% when '10' %}October
+                {% when '11' %}November
+                {% when '12' %}December
+                {% endcase %}
+                {{ page.date | date: "%-d" }},
+                {{ page.date | date: "%Y" }}
+        </h2>
+    </header>
+    <section id="post-body">
+        {{ content }}
+    </section>
+    
+    {% assign author = site.authors[page.author] %}
+    <footer class="author">
+        <div class="written">
+            <p/>Written by: </p>
+        </div>
+        <div>
+            {% include author.html id=0 author=author %}
+        </div>
+    </footer>
+</article>
+
+<!-- Disqus comments -->
+{% if site.disqus %}
+<div class="comments">
+    {% include disqus.html %}
+</div>
+{% endif %}

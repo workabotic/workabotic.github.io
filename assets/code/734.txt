@@ -1,0 +1,59 @@
+class Car:
+    def __init__(self, make, model, year):
+        self.make = make
+        self.model = model
+        self.year = year
+
+    def __str__(self):
+        return f"{self.year} {self.make} {self.model}"
+
+class Garage:
+    def __init__(self):
+        self.cars = []  # List to store cars in the garage
+
+    def add_car(self, car):
+        if isinstance(car, Car):
+            self.cars.append(car)
+            print(f"Added {car} to the garage.")
+        else:
+            print("Only objects of type Car can be added.")
+
+    def remove_car(self, make, model):
+        for car in self.cars:
+            if car.make == make and car.model == model:
+                self.cars.remove(car)
+                print(f"Removed {car} from the garage.")
+                return
+        print(f"No car found with make '{make}' and model '{model}'.")
+
+    def list_cars(self):
+        if not self.cars:
+            print("No cars in the garage.")
+        else:
+            print("Cars in the garage:")
+            for car in self.cars:
+                print(f" - {car}")
+
+def main():
+    # Create some Car objects
+    car1 = Car("Toyota", "Corolla", 2020)
+    car2 = Car("Honda", "Civic", 2018)
+    car3 = Car("Ford", "Mustang", 2021)
+
+    # Create a Garage object
+    garage = Garage()
+
+    # Add cars to the garage
+    garage.add_car(car1)
+    garage.add_car(car2)
+    garage.add_car(car3)
+
+    # List all cars
+    garage.list_cars()
+
+    # Remove a car and list again
+    garage.remove_car("Honda", "Civic")
+    garage.list_cars()
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,60 @@
+#include <iostream>
+#include <string>
+
+// BankAccount class definition
+class BankAccount {
+private:
+    std::string accountHolder;
+    double balance;
+
+public:
+    // Constructor
+    BankAccount(const std::string& holder, double initialBalance) 
+        : accountHolder(holder), balance(initialBalance) {}
+
+    // Deposit function
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            std::cout << "Deposited: $" << amount << std::endl;
+        } else {
+            std::cout << "Deposit amount must be positive." << std::endl;
+        }
+    }
+
+    // Withdraw function
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            std::cout << "Withdrew: $" << amount << std::endl;
+        } else if (amount > balance) {
+            std::cout << "Insufficient funds." << std::endl;
+        } else {
+            std::cout << "Withdrawal amount must be positive." << std::endl;
+        }
+    }
+
+    // Display account details
+    void displayAccountInfo() const {
+        std::cout << "Account Holder: " << accountHolder << std::endl;
+        std::cout << "Balance: $" << balance << std::endl;
+    }
+};
+
+int main() {
+    // Create a BankAccount object
+    BankAccount myAccount("John Doe", 500.00);
+
+    // Display initial account info
+    myAccount.displayAccountInfo();
+
+    // Perform some transactions
+    myAccount.deposit(150.00);
+    myAccount.withdraw(75.00);
+    myAccount.withdraw(1000.00); // Attempt to withdraw more than balance
+
+    // Display final account info
+    myAccount.displayAccountInfo();
+
+    return 0;
+}
