@@ -1,0 +1,26 @@
+class FitnessTracker:
+    def __init__(self, owner):
+        self.owner = owner
+        self.steps = 0
+        self.active_minutes = 0
+
+    def log_steps(self, step_count):
+        self.steps += step_count
+        print(f"{step_count} steps logged. Total steps: {self.steps}")
+
+    def log_activity(self, minutes):
+        self.active_minutes += minutes
+        print(f"{minutes} active minutes logged. Total active minutes: {self.active_minutes}")
+
+    def __str__(self):
+        return f"FitnessTracker(owner={self.owner}, steps={self.steps}, active_minutes={self.active_minutes})"
+
+def main():
+    tracker = FitnessTracker("Alice")
+    print(tracker)
+    tracker.log_steps(5000)
+    tracker.log_activity(30)
+    print(tracker)
+
+if __name__ == "__main__":
+    main()

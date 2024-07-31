@@ -1,0 +1,33 @@
+class CoffeeMachine:
+    def __init__(self, model):
+        self.model = model
+        self.is_brewing = False
+
+    def start_brewing(self):
+        if not self.is_brewing:
+            self.is_brewing = True
+            print(f"{self.model} is brewing coffee.")
+        else:
+            print(f"{self.model} is already brewing.")
+
+    def stop_brewing(self):
+        if self.is_brewing:
+            self.is_brewing = False
+            print(f"{self.model} has stopped brewing.")
+        else:
+            print(f"{self.model} was not brewing.")
+
+    def __str__(self):
+        status = "brewing" if self.is_brewing else "not brewing"
+        return f"CoffeeMachine(model={self.model}, status={status})"
+
+def main():
+    machine = CoffeeMachine("Nespresso")
+    print(machine)
+    machine.start_brewing()
+    print(machine)
+    machine.stop_brewing()
+    print(machine)
+
+if __name__ == "__main__":
+    main()

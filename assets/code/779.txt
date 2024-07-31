@@ -1,0 +1,30 @@
+class Recipe:
+    def __init__(self, name):
+        self.name = name
+        self.ingredients = []
+        self.instructions = []
+
+    def add_ingredient(self, ingredient, quantity):
+        self.ingredients.append((ingredient, quantity))
+        print(f"Added ingredient: {quantity} of {ingredient}")
+
+    def add_instruction(self, step):
+        self.instructions.append(step)
+        print(f"Added instruction: {step}")
+
+    def __str__(self):
+        ingredients_list = ', '.join([f"{qty} of {ing}" for ing, qty in self.ingredients])
+        instructions_list = '\n'.join(self.instructions)
+        return (f"Recipe(name={self.name}, ingredients=[{ingredients_list}], "
+                f"instructions={instructions_list})")
+
+def main():
+    cake = Recipe("Chocolate Cake")
+    cake.add_ingredient("Flour", "2 cups")
+    cake.add_ingredient("Sugar", "1.5 cups")
+    cake.add_instruction("Preheat oven to 180°C.")
+    cake.add_instruction("Mix ingredients and bake for 30 minutes.")
+    print(cake)
+
+if __name__ == "__main__":
+    main()

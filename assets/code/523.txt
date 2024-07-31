@@ -1,0 +1,56 @@
+#include <iostream>
+
+// Function prototypes
+int fibonacciRecursive(int n);
+int fibonacciIterative(int n);
+
+int main() {
+    int n;
+    
+    // Input the number of terms to display
+    std::cout << "Enter the number of terms: ";
+    std::cin >> n;
+
+    // Display Fibonacci sequence using recursive method
+    std::cout << "Fibonacci sequence (recursive):" << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << fibonacciRecursive(i) << " ";
+    }
+    std::cout << std::endl;
+
+    // Display Fibonacci sequence using iterative method
+    std::cout << "Fibonacci sequence (iterative):" << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << fibonacciIterative(i) << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+// Recursive Fibonacci function
+int fibonacciRecursive(int n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+}
+
+// Iterative Fibonacci function
+int fibonacciIterative(int n) {
+    if (n <= 1) {
+        return n;
+    }
+
+    int a = 0;
+    int b = 1;
+    int c;
+
+    for (int i = 2; i <= n; i++) {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+
+    return b;
+}

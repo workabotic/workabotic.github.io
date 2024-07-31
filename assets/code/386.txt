@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+#define SIZE 5
+
+int find_largest(int arr[], int size);
+
+int main() {
+    int numbers[SIZE];
+    
+    // Input array elements
+    printf("Enter %d integers:\n", SIZE);
+    for (int i = 0; i < SIZE; i++) {
+        scanf("%d", &numbers[i]);
+    }
+    
+    // Find and display the largest number
+    int largest = find_largest(numbers, SIZE);
+    printf("The largest number is: %d\n", largest);
+    
+    return 0;
+}
+
+// Function to find the largest number in an array
+int find_largest(int arr[], int size) {
+    int largest = arr[0]; // Assume the first element is the largest
+    for (int i = 1; i < size; i++) {
+        if (arr[i] > largest) {
+            largest = arr[i];
+        }
+    }
+    return largest;
+}

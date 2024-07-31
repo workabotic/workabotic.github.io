@@ -1,0 +1,32 @@
+class GroceryStore:
+    def __init__(self, name):
+        self.name = name
+        self.inventory = {}
+
+    def add_item(self, item_name, quantity):
+        if item_name in self.inventory:
+            self.inventory[item_name] += quantity
+        else:
+            self.inventory[item_name] = quantity
+        print(f"Added {quantity} of {item_name}. Total: {self.inventory[item_name]}")
+
+    def sell_item(self, item_name, quantity):
+        if item_name in self.inventory and self.inventory[item_name] >= quantity:
+            self.inventory[item_name] -= quantity
+            print(f"Sold {quantity} of {item_name}. Remaining: {self.inventory[item_name]}")
+        else:
+            print(f"Not enough {item_name} in stock or item not found.")
+
+    def __str__(self):
+        return f"GroceryStore(name={self.name}, inventory={self.inventory})"
+
+def main():
+    store = GroceryStore("Fresh Market")
+    print(store)
+    store.add_item("Apples", 100)
+    store.add_item("Bananas", 50)
+    store.sell_item("Apples", 30)
+    print(store)
+
+if __name__ == "__main__":
+    main()

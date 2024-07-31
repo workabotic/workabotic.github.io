@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *array;
+    size_t size;
+    size_t i;
+
+    // Prompt user for the number of elements
+    printf("Enter the number of elements: ");
+    scanf("%zu", &size);
+
+    // Allocate memory for the array
+    array = (int *)malloc(size * sizeof(int));
+    if (array == NULL) {
+        perror("Error allocating memory");
+        return EXIT_FAILURE;
+    }
+
+    // Input values for the array
+    printf("Enter %zu integers:\n", size);
+    for (i = 0; i < size; ++i) {
+        scanf("%d", &array[i]);
+    }
+
+    // Display the values
+    printf("You entered:\n");
+    for (i = 0; i < size; ++i) {
+        printf("%d ", array[i]);
+    }
+    printf("\n");
+
+    // Free the allocated memory
+    free(array);
+
+    return EXIT_SUCCESS;
+}

@@ -1,0 +1,17 @@
+<section id="post-list">
+  {% for post in paginator.posts %}
+  <a class="block" href="{{ site.baseurl }}{{ post.url }}">
+    <article class="listing">
+      <div class="post-details">
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.description }}</p>
+        <span class="time">Written <time class="timeago" datetime="{{ post.date }}"></time> by {{ site.authors[post.author].name }} </span>
+      </div>
+    </article>
+  </a>
+  {% endfor %}
+</section>
+
+{% if paginator.previous_page or paginator.next_page %}
+    {% include pagination.html %}
+{% endif %}

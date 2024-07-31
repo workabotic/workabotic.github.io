@@ -1,0 +1,29 @@
+class Office:
+    def __init__(self, name):
+        self.name = name
+        self.employees = []
+
+    def add_employee(self, employee_name):
+        self.employees.append(employee_name)
+        print(f"Added employee: {employee_name}")
+
+    def remove_employee(self, employee_name):
+        if employee_name in self.employees:
+            self.employees.remove(employee_name)
+            print(f"Removed employee: {employee_name}")
+        else:
+            print(f"Employee {employee_name} not found.")
+
+    def __str__(self):
+        return f"Office(name={self.name}, employees={self.employees})"
+
+def main():
+    office = Office("Tech Innovations Inc.")
+    office.add_employee("John Doe")
+    office.add_employee("Jane Smith")
+    print(office)
+    office.remove_employee("John Doe")
+    print(office)
+
+if __name__ == "__main__":
+    main()

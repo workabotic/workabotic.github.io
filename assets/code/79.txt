@@ -1,0 +1,113 @@
+.section .data
+prompt1: .asciz "Enter first number: "
+prompt2: .asciz "Enter second number: "
+result_msg: .asciz "Result: "
+newline: .asciz "\n"
+
+.balign 4
+.section .bss
+num1: .space 4
+num2: .space 4
+result: .space 12
+
+.section .text
+.global _start
+
+_start:
+    // Print first prompt
+    ldr r0, =prompt1
+    bl print_string
+
+    // Read first number
+    ldr r0, =num1
+    bl read_int
+
+    // Print second prompt
+    ldr r0, =prompt2
+    bl print_string
+
+    // Read second number
+    ldr r0, =num2
+    bl read_int
+
+    // Load numbers and add them
+    ldr r1, [num1]
+    ldr r2, [num2]
+    add r3, r1, r2
+
+    // Print result message
+    ldr r0, =result_msg
+    bl print_string
+
+    // Convert result to string and print it
+    mov r0, r3
+    ldr r1, =result
+    bl itoa
+    ldr r0, =result
+    bl print_string
+
+    // Print newline
+    ldr r0, =newline
+    bl print_string
+
+    // Exit program
+    mov r0, #0
+    mov r7, #1
+    svc 0
+
+// Function to print a string
+print_string:
+    mov r1, r0
+    mov r2, #0
+print_loop:
+    ldrb r3, [r1, r2]
+    cmp r3, #0
+    beq print_done
+    add r2, r2, #1
+    b print_loop
+print_done:
+    mov r2, r2
+    mov r7, #4
+    mov r1, r0
+    mov r0, #1
+    svc 0
+    bx lr
+
+// Function to read an integer
+read_int:
+    mov r2, #12
+    mov r7, #3
+    mov r1, r0
+    mov r0, #0
+    svc 0
+    ldr r0, r1
+    bl atoi
+    str r0, [r1]
+    bx lr
+
+// Function to convert ASCII to integer
+atoi:
+    mov r1, #0
+atoi_loop:
+    ldrb r2, [r0], #1
+    cmp r2, #10
+    beq atoi_done
+    sub r2, r2, #48
+    mul r1, r1, #10
+    add r1, r1, r2
+    b atoi_loop
+atoi_done:
+    mov r0, r1
+    bx lr
+
+// Function to convert integer to ASCII
+itoa:
+    mov r2, #10
+itoa_loop:
+    udiv r3, r0, r2
+    mls r1, r3, r2, r0
+    add r1, r1, #48
+    strb r1, [r1]
+    cmp r3, #0
+    bne itoa_loop
+    bx lr

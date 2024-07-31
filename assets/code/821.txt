@@ -1,0 +1,34 @@
+class Smartphone:
+    def __init__(self, brand, model):
+        self.brand = brand
+        self.model = model
+        self.is_on = False
+
+    def power_on(self):
+        if not self.is_on:
+            self.is_on = True
+            print(f"{self.brand} {self.model} is now ON.")
+        else:
+            print(f"{self.brand} {self.model} is already ON.")
+
+    def power_off(self):
+        if self.is_on:
+            self.is_on = False
+            print(f"{self.brand} {self.model} is now OFF.")
+        else:
+            print(f"{self.brand} {self.model} is already OFF.")
+
+    def __str__(self):
+        status = "ON" if self.is_on else "OFF"
+        return f"Smartphone(brand={self.brand}, model={self.model}, status={status})"
+
+def main():
+    phone = Smartphone("Apple", "iPhone 14")
+    print(phone)
+    phone.power_on()
+    print(phone)
+    phone.power_off()
+    print(phone)
+
+if __name__ == "__main__":
+    main()

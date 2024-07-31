@@ -1,0 +1,26 @@
+class Contact:
+    def __init__(self, name, phone, email):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+    def update_phone(self, new_phone):
+        self.phone = new_phone
+        print(f"Phone number updated to {self.phone}.")
+
+    def update_email(self, new_email):
+        self.email = new_email
+        print(f"Email address updated to {self.email}.")
+
+    def __str__(self):
+        return f"Contact(name={self.name}, phone={self.phone}, email={self.email})"
+
+def main():
+    contact = Contact("Alice Smith", "123-456-7890", "alice@example.com")
+    print(contact)
+    contact.update_phone("987-654-3210")
+    contact.update_email("alice.smith@example.com")
+    print(contact)
+
+if __name__ == "__main__":
+    main()

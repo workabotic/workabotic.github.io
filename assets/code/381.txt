@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file;
+    const char *filename = "example.txt";
+    const char *text = "Hello, world! This is a file I/O example in C.";
+    char buffer[256];
+
+    // Open file for writing
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Error opening file for writing");
+        return EXIT_FAILURE;
+    }
+
+    // Write text to file
+    fprintf(file, "%s\n", text);
+
+    // Close the file
+    fclose(file);
+
+    // Open file for reading
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Error opening file for reading");
+        return EXIT_FAILURE;
+    }
+
+    // Read text from file
+    if (fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("Read from file: %s", buffer);
+    } else {
+        perror("Error reading from file");
+    }
+
+    // Close the file
+    fclose(file);
+
+    return EXIT_SUCCESS;
+}

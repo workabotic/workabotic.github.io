@@ -1,0 +1,44 @@
+#include <stdio.h>
+
+// Function prototypes
+long long factorial_iterative(int n);
+long long factorial_recursive(int n);
+
+int main() {
+    int number;
+    
+    // Prompt user for input
+    printf("Enter a positive integer: ");
+    scanf("%d", &number);
+    
+    if (number < 0) {
+        printf("Factorial is not defined for negative numbers.\n");
+        return 1;
+    }
+    
+    // Calculate factorial using iterative method
+    printf("Factorial of %d (iterative) is %lld\n", number, factorial_iterative(number));
+    
+    // Calculate factorial using recursive method
+    printf("Factorial of %d (recursive) is %lld\n", number, factorial_recursive(number));
+    
+    return 0;
+}
+
+// Iterative function to calculate factorial
+long long factorial_iterative(int n) {
+    long long result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+// Recursive function to calculate factorial
+long long factorial_recursive(int n) {
+    if (n == 0 || n == 1) {
+        return 1;
+    } else {
+        return n * factorial_recursive(n - 1);
+    }
+}

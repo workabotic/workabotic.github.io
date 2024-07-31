@@ -1,0 +1,42 @@
+%macro sysdef 2
+  %define sys_%1        %2
+%endmacro
+sysdef write,           1
+sysdef exit,            60
+sysdef nanosleep,       35
+
+%macro inv 1-7 0,0,0,0,0,0
+  mov r9,%7
+  mov r8,%6
+  mov r10,%5
+  mov rdx,%4
+  mov rsi,%3
+  mov rdi,%2
+  mov rax,sys_%1
+  syscall
+%endmacro
+
+section .data
+  timeval:
+    tv_sec   dq 0
+    tv_nsec  dq 0
+
+section .rodata
+  str1 db "Sleeping",0xa,0
+  str2 db "Awake!",0xa,0
+
+section .text
+
+  global main
+  main:
+    lea rbx, [rel str1]
+    inv write, 1, rbx, 9
+    mov qword [rel tv_sec], 5
+    mov qword [rel tv_nsec], 0
+    lea rax, [rel timeval]
+    inv nanosleep, rax, 0
+    lea rbx, [rel str2]
+    inv write, 1, rbx, 7
+    lea rbx, [rel str2]
+    inv exit, 0
+    ret

@@ -1,0 +1,67 @@
+#include <stdio.h>
+
+// Function prototypes
+void bubbleSort(int arr[], int size);
+void printArray(int arr[], int size);
+
+int main() {
+    int size;
+
+    // Prompt the user for the size of the array
+    printf("Enter the number of elements in the array: ");
+    scanf("%d", &size);
+
+    // Check for valid size
+    if (size <= 0) {
+        printf("Array size must be a positive integer.\n");
+        return 1;
+    }
+
+    int arr[size];  // Declare an array of the given size
+
+    // Input elements of the array
+    printf("Enter %d elements:\n", size);
+    for (int i = 0; i < size; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Sort the array using bubble sort
+    bubbleSort(arr, size);
+
+    // Print the sorted array
+    printf("Sorted array:\n");
+    printArray(arr, size);
+
+    return 0;
+}
+
+// Function to perform bubble sort
+void bubbleSort(int arr[], int size) {
+    int temp;
+    int swapped;
+
+    for (int i = 0; i < size - 1; i++) {
+        swapped = 0;
+        for (int j = 0; j < size - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap arr[j] and arr[j + 1]
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                swapped = 1;
+            }
+        }
+        // If no elements were swapped, the array is already sorted
+        if (swapped == 0) {
+            break;
+        }
+    }
+}
+
+// Function to print the elements of the array
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}

@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+#define SIZE 7
+
+int main() {
+    int numbers[SIZE] = {34, 78, 12, 56, 89, 23, 45};
+    int max = numbers[0];
+    int min = numbers[0];
+    
+    // Find maximum and minimum values
+    for (int i = 1; i < SIZE; i++) {
+        if (numbers[i] > max) {
+            max = numbers[i];
+        }
+        if (numbers[i] < min) {
+            min = numbers[i];
+        }
+    }
+    
+    // Print results
+    printf("Array elements:\n");
+    for (int i = 0; i < SIZE; i++) {
+        printf("%d ", numbers[i]);
+    }
+    printf("\nMaximum value: %d\n", max);
+    printf("Minimum value: %d\n", min);
+    
+    return 0;
+}

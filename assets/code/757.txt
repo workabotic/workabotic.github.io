@@ -1,0 +1,33 @@
+import datetime
+
+class DigitalClock:
+    def __init__(self):
+        self.current_time = datetime.datetime.now().strftime("%H:%M:%S")
+        self.alarm_time = None
+
+    def update_time(self):
+        self.current_time = datetime.datetime.now().strftime("%H:%M:%S")
+        print(f"Current time: {self.current_time}")
+
+    def set_alarm(self, time_str):
+        self.alarm_time = time_str
+        print(f"Alarm set for: {self.alarm_time}")
+
+    def check_alarm(self):
+        if self.current_time == self.alarm_time:
+            print("Alarm ringing!")
+        else:
+            print("No alarm.")
+
+    def __str__(self):
+        return f"DigitalClock(current_time={self.current_time}, alarm_time={self.alarm_time})"
+
+def main():
+    clock = DigitalClock()
+    print(clock)
+    clock.update_time()
+    clock.set_alarm("14:30:00")  # Example alarm time
+    clock.check_alarm()
+
+if __name__ == "__main__":
+    main()

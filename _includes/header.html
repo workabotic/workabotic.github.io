@@ -1,0 +1,19 @@
+<header>
+  {% include navigation.html %}
+
+  {% if page.layout != 'post' %}
+  <div id="page-header" class="default-header">
+    <pre>
+      <code id="auto-code" class="language-c hljs cpp wrapper" data-lang="c"></code>
+    </pre>
+
+    <div id="site-logo">
+      <h1 class="name logo">
+        <a href="{{ site.baseurl }}/">
+          <span class="glitch" data-text="{{ site.name }}">{{ site.name }}</span>
+        </a>
+      </h1>
+    </div>
+  </div>
+  {% endif %}
+</header>

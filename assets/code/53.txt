@@ -1,0 +1,114 @@
+section .bss
+    num1 resb 10         ; Reserve 10 bytes for the first number input
+    num2 resb 10         ; Reserve 10 bytes for the second number input
+    result resb 10       ; Reserve 10 bytes for the result output
+
+section .data
+    prompt1 db 'Enter the first number: ', 0
+    prompt1_len equ $ - prompt1
+    prompt2 db 'Enter the second number: ', 0
+    prompt2_len equ $ - prompt2
+    result_msg db 'The result is: ', 0
+    result_msg_len equ $ - result_msg
+    newline db 10, 0     ; Newline character
+
+section .text
+    global _start
+
+_start:
+    ; Print prompt1
+    mov eax, 4                ; sys_write system call number
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, prompt1          ; Pointer to the prompt1 string
+    mov edx, prompt1_len      ; Length of the prompt1 string
+    int 0x80                  ; Call kernel
+
+    ; Read num1
+    mov eax, 3                ; sys_read system call number
+    mov ebx, 0                ; File descriptor 0 (stdin)
+    mov ecx, num1             ; Pointer to the num1 buffer
+    mov edx, 10               ; Maximum number of bytes to read
+    int 0x80                  ; Call kernel
+
+    ; Print prompt2
+    mov eax, 4                ; sys_write system call number
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, prompt2          ; Pointer to the prompt2 string
+    mov edx, prompt2_len      ; Length of the prompt2 string
+    int 0x80                  ; Call kernel
+
+    ; Read num2
+    mov eax, 3                ; sys_read system call number
+    mov ebx, 0                ; File descriptor 0 (stdin)
+    mov ecx, num2             ; Pointer to the num2 buffer
+    mov edx, 10               ; Maximum number of bytes to read
+    int 0x80                  ; Call kernel
+
+    ; Convert num1 to integer
+    mov ecx, num1             ; Pointer to the num1 buffer
+    call atoi                 ; Convert ASCII to integer
+    mov ebx, eax              ; Store the integer in ebx
+
+    ; Convert num2 to integer
+    mov ecx, num2             ; Pointer to the num2 buffer
+    call atoi                 ; Convert ASCII to integer
+    add eax, ebx              ; Add the two integers
+
+    ; Convert result to ASCII
+    mov ecx, result           ; Pointer to the result buffer
+    call itoa                 ; Convert integer to ASCII
+
+    ; Print result message
+    mov eax, 4                ; sys_write system call number
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, result_msg       ; Pointer to the result message string
+    mov edx, result_msg_len   ; Length of the result message string
+    int 0x80                  ; Call kernel
+
+    ; Print result
+    mov eax, 4                ; sys_write system call number
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, result           ; Pointer to the result buffer
+    int 0x80                  ; Call kernel
+
+    ; Print newline
+    mov eax, 4                ; sys_write system call number
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, newline          ; Pointer to the newline character
+    mov edx, 1                ; Length of the newline character
+    int 0x80                  ; Call kernel
+
+    ; Exit the program
+    mov eax, 1                ; sys_exit system call number
+    xor ebx, ebx              ; Exit code 0
+    int 0x80                  ; Call kernel
+
+; Function to convert ASCII to integer
+atoi:
+    xor eax, eax              ; Clear eax
+    xor ebx, ebx              ; Clear ebx
+atoi_loop:
+    mov bl, [ecx]             ; Load byte from buffer
+    cmp bl, 10                ; Compare with newline character
+    je atoi_end               ; If newline, end loop
+    sub bl, '0'               ; Convert ASCII to integer
+    imul eax, eax, 10         ; Multiply current result by 10
+    add eax, ebx              ; Add the new digit
+    inc ecx                   ; Move to the next byte
+    jmp atoi_loop             ; Repeat the loop
+atoi_end:
+    ret                       ; Return the result in eax
+
+; Function to convert integer to ASCII
+itoa:
+    xor ebx, ebx              ; Clear ebx
+    mov ebx, 10               ; Set divisor to 10
+itoa_loop:
+    xor edx, edx              ; Clear edx
+    div ebx                   ; Divide eax by 10
+    add dl, '0'               ; Convert remainder to ASCII
+    dec ecx                   ; Move pointer backwards
+    mov [ecx], dl             ; Store the digit
+    test eax, eax             ; Test if eax is zero
+    jnz itoa_loop             ; If not, repeat the loop
+    ret                       ; Return the pointer in ecx

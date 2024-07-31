@@ -1,0 +1,116 @@
+#include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+std::vector<std::string> string_to_vector(const std::string& word) {
+	std::vector<std::string> letters{ };
+	for ( const char& ch : word ) {
+		letters.emplace_back(std::string(1, ch));
+	}
+	return letters;
+}
+
+std::string vector_to_string(const std::vector<std::string>& letters) {
+	std::string result = "";
+	for ( const std::string& letter : letters ) {
+		result += letter;
+	}
+	return result;
+}
+
+std::vector<std::vector<std::string>> create_combinations(
+		const std::vector<std::string>& words, const uint32_t& k) {
+	std::vector<std::vector<std::string>> combinations{ };
+	std::vector<bool> visited(words.size());
+	std::fill(visited.end() - k, visited.end(), true);
+	while ( std::next_permutation(visited.begin(), visited.end()) ) {
+		std::vector<std::string> combination{ };
+		for ( uint32_t i = 0; i < words.size(); ++i ) {
+			if ( visited[i] ) {
+				combination.emplace_back(words[i]);
+			}
+		}
+		combinations.emplace_back(combination);
+	}
+	return combinations;
+}
+
+void anagram_generator(const std::string& word, std::map<std::string, std::vector<std::string>>& word_map) {
+	std::string text = "";
+	for ( char ch : word ) {
+		ch = std::tolower(ch);
+		if ( ch >= 'a' && ch <= 'z' ) {
+			text += std::string(1, ch);
+		}
+	}
+	std::vector<std::string> text_vector = string_to_vector(text);
+	std::sort(text_vector.begin(), text_vector.end());
+	std::set<std::string> previous_letters{ };
+
+	for ( uint32_t n = text.size() / 2; n >= 1; --n ) {
+		for ( std::vector<std::string> letters_one_vector : create_combinations(text_vector, n) ) {
+			std::sort(letters_one_vector.begin(), letters_one_vector.end());
+			std::string letters_one = vector_to_string(letters_one_vector);
+			if ( previous_letters.contains(letters_one) ) {
+				continue;
+			}
+			previous_letters.insert(letters_one);
+
+			if ( word_map.contains(letters_one) ) {
+				std::vector<std::string> anagrams_one = word_map[letters_one];
+				std::vector<std::string> letters_two_vector{ };
+				std::set_difference(text_vector.begin(), text_vector.end(),
+					letters_one_vector.begin(), letters_one_vector.end(), back_inserter(letters_two_vector));
+				std::string letters_two = vector_to_string(letters_two_vector);
+
+				if ( text.size() == 2 * n ) {
+					if ( previous_letters.contains(letters_two) ) {
+						continue;
+					}
+					previous_letters.insert(letters_two);
+				}
+
+				if ( word_map.contains(letters_two) ) {
+					std::vector<std::string> anagrams_two = word_map[letters_two];
+					for ( const std::string& word_one : anagrams_one ) {
+						for ( const std::string& word_two : anagrams_two ) {
+							std::cout << " " << word_one << " " << word_two << std::endl;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+int main() {
+	std::map<std::string, std::vector<std::string>> word_map{ };
+	std::fstream file_stream;
+	file_stream.open("../unixdict.txt");
+	std::string word;
+	while ( file_stream >> word ) {
+		std::vector<std::string> letters = string_to_vector(word);
+		std::sort(letters.begin(), letters.end());
+		std::string sorted_word = std::accumulate(letters.begin(), letters.end(), std::string{ });
+		if ( word_map.contains(sorted_word) ) {
+			word_map[sorted_word].emplace_back(word);
+		} else {
+			std::vector<std::string> entry{ word };
+			word_map[sorted_word] = entry;
+		}
+	}
+	file_stream.close();
+
+	std::vector<std::string> words{ "Rosetta code", "Joe Biden", "Clint Eastwood" };
+	for ( const std::string& word : words ) {
+		std::cout << "Two word anagrams of " << word << ":" << std::endl;
+		anagram_generator(word, word_map);
+		std::cout << std::endl;
+	}
+}

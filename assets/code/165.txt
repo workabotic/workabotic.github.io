@@ -1,0 +1,9 @@
+SWI n
+
+B label
+
+BL label
+
+BX Rn
+
+addeq R0,R0,#1

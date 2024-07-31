@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+// Function prototypes
+unsigned long long int factorialIterative(int n);
+unsigned long long int factorialRecursive(int n);
+
+int main() {
+    int number = 5;
+
+    printf("Factorial of %d (iterative): %llu\n", number, factorialIterative(number));
+    printf("Factorial of %d (recursive): %llu\n", number, factorialRecursive(number));
+
+    return 0;
+}
+
+// Function to calculate factorial iteratively
+unsigned long long int factorialIterative(int n) {
+    unsigned long long int result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+// Function to calculate factorial recursively
+unsigned long long int factorialRecursive(int n) {
+    if (n == 0 || n == 1) {
+        return 1;
+    } else {
+        return n * factorialRecursive(n - 1);
+    }
+}
