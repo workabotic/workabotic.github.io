@@ -1,7 +1,7 @@
 ---
 title:  "Smart Dimmer Controlled by Mobile App"
 date: 2024-08-01 18:00:00
-description: Detailed documentation of the project and development of a smart dimmer using an ESP32 microcontroller and a mobile app to control the brightness of an attached incandescent light bulb.
+description: Project documentation and development of a smart dimmer using an ESP32 microcontroller, with a mobile app to control the brightness of an incandescent light bulb.
 author: lucasmazz
 keywords: IoT, dimmer, electronic, electronics, TRIAC, triac, ESP32, esp32, microcontroller, control, mobile, app
 ---
