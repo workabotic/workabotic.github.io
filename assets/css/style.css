@@ -172,7 +172,6 @@ pre	{
 	background: #111111;
   font-family: 'Source Code Pro',Menlo,monospace;
   font-size: 12px;
-  line-height: 1.5em;
   font-weight: 500;
 	color: #d0d4d7;
 }
@@ -991,7 +990,7 @@ nav.main-nav a.cta {
   .wrapper { padding:20px 20px 20px 20px; }
 
   #site-logo {
-    padding: 8rem 4rem;
+    padding: 6rem 6rem;
   }
 
   #page-header {
