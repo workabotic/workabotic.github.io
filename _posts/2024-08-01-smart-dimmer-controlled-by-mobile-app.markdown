@@ -1,9 +1,9 @@
 ---
-title:  "Smart Dimmer Controlled by Mobile App"
+title: "Smart Dimmer Controlled by Mobile App"
 date: 2024-08-01 18:00:00
-description: Project documentation and development of a smart dimmer using an ESP32 microcontroller, with a mobile app to control the brightness of an incandescent light bulb.
+description: A smart dimmer system built using an ESP32 microcontroller, controlled via a mobile app to adjust the brightness of an incandescent bulb.
 author: lucasmazz
-keywords: IoT, dimmer, electronic, electronics, TRIAC, triac, ESP32, esp32, microcontroller, control, mobile, app
+keywords: android, microcontroller, embedded, microcontroller, IoT, espressif, ESP32, esp32, esp-idf, RTOS, FreeRTOS, dimmer, TRIAC, mobile app, automation, smart home, dimmer circuit, home automation, Wi-Fi dimmer, electronics, embedded systems, electrical engineering, DIY.
 ---
 
 Dimmers are electronic devices typically connected to lights to control their brightness. Similar circuits can also be used in various applications, such as controlling the speed of an electric motor or setting the temperature of an electric oven. The basic idea is to limit the power supplied from a source to the load by altering the waveform of the applied voltage.
@@ -1464,4 +1464,4 @@ Here are some final considerations for the development of this project:
 2. **Access**: The web server is accessible only to devices connected to the ESP32 access point. Be aware that devices will disconnect from other networks when connecting to the ESP32's access point to send commands to the dimmer.
 3. **HTTP Method**: The web server uses HTTP GET requests for simplicity in receiving brightness parameters. For integration into larger systems like a smart home, consider using HTTP POST requests. Additionally, if the web server is exposed to the internet, implement authentication and encryption to ensure security.
 
-The complete source code used in this project is available on [GitHub](https://github.com/workabotic/smart-dimmer-controlled-by-mobile-app).
+The complete source code used in this project is available on [GitHub](https://github.com/workabotic/smart_dimmer_controlled_by_mobile_app).
