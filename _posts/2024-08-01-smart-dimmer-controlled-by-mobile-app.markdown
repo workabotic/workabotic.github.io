@@ -1464,4 +1464,4 @@ Here are some final considerations for the development of this project:
 2. **Access**: The web server is accessible only to devices connected to the ESP32 access point. Be aware that devices will disconnect from other networks when connecting to the ESP32's access point to send commands to the dimmer.
 3. **HTTP Method**: The web server uses HTTP GET requests for simplicity in receiving brightness parameters. For integration into larger systems like a smart home, consider using HTTP POST requests. Additionally, if the web server is exposed to the internet, implement authentication and encryption to ensure security.
 
-The complete source code used in this project is available on [GitHub](https://github.com/workabotic/smart-dimmer-controlled-by-mobile-app).
+The complete source code used in this project is available on [GitHub](https://github.com/workabotic/smart_dimmer_controlled_by_mobile_app).
