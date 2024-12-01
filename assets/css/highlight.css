@@ -232,12 +232,19 @@
   padding: 0;
 }
 
-.highlight pre {
-  padding: 8px;
-}
-
 .highlight .lineno {
   text-align: right;
-  padding: 8px 8px 8px 0;
+  padding: 0 8px 0 0;
   color: #75715e;
+}
+
+.highlight .rouge-gutter {
+  width: 32px;
+}
+
+.rouge-code pre {
+  /* overflow-x: auto; */
+  /* white-space: pre; */
+  white-space: pre;
+
 }

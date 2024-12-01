@@ -159,6 +159,8 @@ div.highlighter-rouge {
   width: 100%;
   overflow-x: auto;
   margin-bottom: 32px;
+  padding: 8px;
+  background-color: #111;
 }
 
 div.highlight {
@@ -208,6 +210,7 @@ p {
 #post-body ul {
   line-height: 32px;
   margin-left: 32px;
+  margin-bottom: 32px;
 }
 
 #about-body {
@@ -604,8 +607,12 @@ nav.main-nav a.cta {
 	text-align:center;
 }
 
-.post h1, h2, h3, h4 {
+.post h1, h2 {
   text-decoration: underline;
+}
+
+.post h3, h4 {
+  font-weight: bold;
 }
 
 .post h1 {
@@ -956,7 +963,7 @@ nav.main-nav a.cta {
 .hljs {
 	background: #111111 !important;
   display: block;
-  overflow-x: auto;
+  /* overflow-x: auto; */
   -webkit-text-size-adjust: none;
 }
 
