@@ -243,8 +243,5 @@
 }
 
 .rouge-code pre {
-  /* overflow-x: auto; */
-  /* white-space: pre; */
   white-space: pre;
-
 }

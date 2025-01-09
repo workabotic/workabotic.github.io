@@ -111,18 +111,17 @@ p a,
   color: #7ba32c;
 }
 
-h1, h2 {
+h1, h2, h3 {
   font-family: "VT323";
   text-transform: uppercase;
 }
 
-h3, h4, h5 {
+h4, h5 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-h3 { font-size:22px; font-weight: 400; }
-h4 { font-size:18px; font-weight:bold; }
-h5 { font-size:16px; font-weight: bold; }
+h4 { font-size:22px; font-weight: 400; }
+h5 { font-size:18px; font-weight: bold; }
 
 h6 {
 	font-size: 13px;
@@ -180,6 +179,8 @@ pre	{
 
 b, strong {
   font-weight: 900;
+  color: #7ba32c;
+  font-size: 90%;
 }
 
 em, i {
@@ -202,7 +203,7 @@ p {
   line-height: 1.6;
 }
 
-.post h1, h3, h4, h5, p,
+.post h1, h2, h3, h4, h5, p,
 .post-body ul, #post-list li {
 	margin-bottom: 32px;
 }
@@ -607,11 +608,11 @@ nav.main-nav a.cta {
 	text-align:center;
 }
 
-.post h1, h2 {
+.post h1, h2, h3 {
   text-decoration: underline;
 }
 
-.post h3, h4 {
+.post h4, h5 {
   font-weight: bold;
 }
 
@@ -622,8 +623,20 @@ nav.main-nav a.cta {
 }
 
 .post h2 {
-  font: 300 1.8em/1em "VT323",Helvetica,Arial,sans-serif;
+  font: 300 2.0em/1em "VT323",Helvetica,Arial,sans-serif;
   color: #7ba32c;
+  margin-top: 64px;
+  margin-bottom: 32px;
+}
+
+.post h3 {
+  font: 300 1.6em/1em "VT323",Helvetica,Arial,sans-serif;
+  color: #7ba32c;
+  margin-top: 64px;
+  margin-bottom: 32px;
+}
+
+.post h4 {
   margin-top: 64px;
   margin-bottom: 32px;
 }
