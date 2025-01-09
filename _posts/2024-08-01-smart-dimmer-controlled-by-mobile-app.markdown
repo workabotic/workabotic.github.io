@@ -605,7 +605,7 @@ In the following image, with the brightness value set to 100%, the trigger initi
 ![Optocoupler output and and ESP32 Trigger output adjusted at 100% brightness]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_adjusted_100.webp)
 *Figure 10 — Optocoupler output (blue) and ESP32 Trigger adjusted at 100% brightness (orange).*
 
-At this point, web can accurately control when to trigger the TRIAC to adjust the light's brightness as desired. To achieve this, it is essential to isolate the microcontroller using an optocoupler, which will effectively trigger the TRIAC, as illustrated in the following circuit.
+At this point, we can accurately control when to trigger the TRIAC to adjust the light's brightness as desired. To achieve this, it is essential to isolate the microcontroller using an optocoupler, which will effectively trigger the TRIAC, as illustrated in the following circuit.
 
 ![TRIAC trigger circuit schematic]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/triac_trigger_circuit_schematic.webp)
 *Figure 11 — TRIAC trigger circuit schematic.*
