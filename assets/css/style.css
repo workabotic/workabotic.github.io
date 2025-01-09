@@ -120,7 +120,7 @@ h4, h5 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-h4 { font-size:22px; font-weight: 400; }
+h4 { font-size:18px; font-weight: bold; }
 h5 { font-size:18px; font-weight: bold; }
 
 h6 {
@@ -619,24 +619,25 @@ nav.main-nav a.cta {
 .post h1 {
 	margin-bottom: 0;
 	color: #7ba32c;
-	font: 400 2.5em/1.4em "VT323", Helvetica,Arial,sans-serif;
+	font: 400 2.5em "VT323", Helvetica,Arial,sans-serif;
 }
 
 .post h2 {
-  font: 300 2.0em/1em "VT323",Helvetica,Arial,sans-serif;
+  font: 300 2.0em "VT323",Helvetica,Arial,sans-serif;
   color: #7ba32c;
   margin-top: 64px;
   margin-bottom: 32px;
 }
 
 .post h3 {
-  font: 300 1.6em/1em "VT323",Helvetica,Arial,sans-serif;
+  font: 300 1.5em "VT323",Helvetica,Arial,sans-serif;
   color: #7ba32c;
   margin-top: 64px;
   margin-bottom: 32px;
 }
 
 .post h4 {
+  font-size: 0.9em;
   margin-top: 64px;
   margin-bottom: 32px;
 }
