@@ -6,36 +6,118 @@ author: lucasmazz
 keywords: robot, simulation, gazebo, ros, robotic simulation, autonomous robots, Gazebo simulation, ROS 2, ROS robot simulation, computer vision in robotics, self-driving car simulation, autonomous vehicle technology, simulation environments for robots, real-time robotics simulation, robotic perception
 ---
 
-This article presents the development and simulation of an Ackermann steering vehicle using the Gazebo Harmonic simulator and the ROS 2 Jazzy Jalisco robotics framework. The vehicle model includes steering angle and velocity control, along with an embedded front camera that streams live images for vision-based tasks. This setup provides a safe environment for testing autonomous driving without the risks associated with real-world trials and serves as a platform for researchers and developers aiming to advance mobile robots algorithms.​
+This article presents the development and simulation of an Ackermann steering vehicle using the Gazebo Harmonic simulator and the ROS 2 Jazzy Jalisco robotics framework. The vehicle model includes steering angle and velocity control, along with an embedded front camera that streams live images for vision-based tasks. This setup provides a safe environment for testing autonomous driving without the risks associated with real-world trials and serves as a platform for researchers and developers aiming to advance mobile robots' algorithms.​
 
 ## Introduction 
 
-When developing mobile robots, safety is critical, especially during the early stages of design and testing. Testing directly on real hardware can be risky and expensive. A single mistake can lead to accidents, damage to valuable equipment, or even personal injury. That’s where simulation comes in.
-
-Beyond safety, simulation also plays a key role in training artificial intelligence systems. By creating virtual environments that mimic real-world physics and constraints, we can develop and refine control algorithms and train machine learning models for tasks like path planning, navigation, obstacle avoidance, and localization. 
+When developing mobile robots, safety and cost are critical, especially in the early stages. Simulation provides a safe and efficient alternative to testing on real hardware while also enabling the creation of realistic virtual environments to develop control algorithms and systems for tasks such as navigation, path planning, obstacle avoidance, and localization.
 
 In this article, we'll explore the modeling and simulation of a vehicle using Ackermann steering geometry, a steering mechanism widely used in conventional vehicles. Simulating this steering configuration is needed to ensure realistic movement and precise maneuvering. This project was developed using the Gazebo Harmonic simulator and the ROS 2 Jazzy Jalisco robotics framework, providing a flexible environment for testing and development.
 
 The source code used in this project is available on [GitHub](https://github.com/workabotic/gazebo_ackermann_steering_vehicle). Feel free to explore it, use it in your own projects, or contribute to its development.
 
+### Ackermann Steering Geometry
+
+Ackermann steering geometry is a steering system that ensures smooth turning by aligning the wheels' angles so the inside and outside wheels follow different circular paths. This is achieved by turning the inside wheel more than the outside, accounting for their varying radii during a turn. To achieve this, the geometry adjusts the steering angles so that all wheels point toward a common turning center, reducing tire wear and preventing slipping. This is particularly important for vehicles with four wheels, as improper alignment during turns can compromise stability and handling.
+
+
+![Ackermann Steering Geometry]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/ackermann_steering.webp)
+*Figure 3 — Ackermann Steering Geometry.*
+
+
+Considering that the base steering angle $$\phi$$ represents the desired wheel steering angle in the bicycle model of the vehicle, the individual steering angles of the inner and outer wheels can be determined by examining the geometry of three triangles. These triangles are formed using the following vehicle parameters: track width $$w$$ (lateral wheel distance), wheelbase $$l$$ (longitudinal axle-to-axle distance), base $$\phi$$, inner $$\phi_{i}$$​ and outer $$\phi_{o}$$ wheel steering angles, and the distance $$r$$ from the instantaneous center of curvature to the vehicle's center. 
+
+$$
+tan(\phi) = \frac{l}{r}
+$$
+
+$$
+tan(\phi_{i}) = \frac{l}{(r - \frac{w}{2})}
+$$
+
+$$
+tan(\phi_{o}) = \frac{l}{(r + \frac{w}{2})}
+$$
+
+Then, subtracting the reciprocals of the latter two equations leads to the derivation of the Ackermann steering equation:
+
+$$
+\frac{1}{tan(\phi_{o})} - \frac{1}{tan(\phi_{i})} = cot(\phi_{o}) - cot(\phi_{i}) = \frac{(r + \frac{w}{2})}{l} - \frac{(r - \frac{w}{2})}{l} = \frac{w}{l}
+$$
+
+Alternatively, the two cotangents can be represented in terms of the base angle $$\phi$$ as follows:
+
+$$
+cot(\phi_{i}) - cot(\phi) = \frac{(r - \frac{w}{2})}{l} - \frac{r}{l} = -\frac{w}{2l} \Longleftrightarrow cot(\phi_{i}) = cot(\phi) - \frac{w}{2l}
+$$
+
+$$
+cot(\phi_{o}) - cot(\phi) = \frac{(r + \frac{w}{2})}{l} - \frac{r}{l} = +\frac{w}{2l} \Longleftrightarrow cot(\phi_{o}) = cot(\phi) + \frac{w}{2l}
+$$
+
+These equations encounter a limitation when $$\phi=0$$, since $$cot⁡(0)$$ is undefined. To address this issue, it is possible to use the trigonometric identity $$cot(⁡α)=\frac{cos⁡(α)}{sin⁡(α)}$$ to reformulate the equations, ensuring they remain valid under this condition. The revised equations for the inner and outer wheel steering angles are:
+
+$$
+\phi_{i} = tan^{-1} \left( \frac{2 \cdot l \cdot sin(\phi)}{2 \cdot l \cdot cos(\phi) - w \cdot sin(\phi)} \right)
+$$
+
+$$
+\phi_{o} = tan^{-1} \left( \frac{2 \cdot l \cdot sin(\phi)}{2 \cdot l \cdot cos(\phi) + w \cdot sin(\phi)} \right)
+$$
+
+Hence, it becomes possible to calculate the steering angles of the inner and outer wheels based on the desired base angle, following Ackermann steering geometry principles.
+
+### Rear Differential Model
+
+Furthermore, it is also important to consider the velocity of the rear wheels for an accurate steering model. Each rear wheel follows a circular path with a different radius, meaning that while the angular velocity of both wheels remains the same, the linear velocity of the outer wheel will be greater than that of the inner wheel. In real vehicles, this is usually addressed by a mechanical rear differential, which allows the rear wheels to rotate at different speeds, preventing tire slippage.
+
+![Rear Differential Model]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/rear_differential.webp)
+*Figure 4 — Rear Differential Model.*
+
+Considering the base velocity $$v$$ of the vehicle as a reference, the velocities of the inner ($$v_i$$​) and outer ($$v_o$$​) rear wheels are derived based on the geometry of circular motion. Thus, using the bicycle model, the radius of curvature $$r$$ is defined as:
+
+$$
+r = \frac{l}{tan(\phi)}
+$$
+
+Therefore, the inner and outer rear wheel paths lie on circles of radii:
+
+$$
+r_i = r - \frac{w}{l}
+$$
+
+$$
+r_o = r + \frac{w}{l}
+$$
+
+Considering $$\omega$$ as the angular velocity of the vehicle, then the linear velocities $$v_i$$ and $$v_o$$ of the rear wheels are directly related to $$\omega$$. The relationship is expressed as:
+
+$$
+\omega = \frac{v}{r} = \frac{v_i}{r_i} = \frac{v_o}{r_o} \Longleftrightarrow \omega = \frac{v_i}{(r - \frac{w}{l})} = \frac{v_o}{(r + \frac{w}{l})}
+$$
+
+Then the linear velocities $$v_i$$ and $$v_o$$ of the rear wheels can be defined as:
+
+$$
+v_i = \omega \cdot \left(r - \frac{w}{2}\right) = \frac{v}{r} \cdot \left(r - \frac{w}{2}\right) = \frac{v}{(\frac{l}{tan(\phi)})} \cdot \left(\frac{l}{tan(\phi)} - \frac{w}{2}\right)
+$$
+
+$$
+v_o = \omega \cdot \left(r + \frac{w}{2} \right) = \frac{v}{r} \cdot \left(r + \frac{w}{2}\right) = \frac{v}{(\frac{l}{tan(\phi)})} \cdot \left(\frac{l}{tan(\phi)} + \frac{w}{2}\right)
+$$
+
+This analysis enables the calculation of each rear wheel's velocity based on the steering angle and vehicle speed, ensuring proper steering by considering the differing radii of their circular paths. With this rear differential model, combined with the Ackermann steering geometry derived earlier, the vehicle model can avoid tire slippage and steer as effectively as a real vehicle would.
+
 
 ## Requirements
 
-While other versions of the tools and software may work, adjustments might be required. To ensure proper functionality, it’s recommended to use the versions listed below. Also, ensure that the environment is set up correctly to avoid any issues.
+For the development of this project, the following software dependencies were installed and used as part of the simulation setup:
 
-### Recommended Software Versions
+- [**Linux Ubuntu 24.04**](https://ubuntu.com/blog/tag/ubuntu-24-04-lts) was used as the operating system.
+- [**ROS 2 Jazzy Jalisco**](https://docs.ros.org/en/rolling/Releases/Release-Jazzy-Jalisco.html) was used as the robotics framework.
+- [**Gazebo Harmonic**](https://gazebosim.org/docs/harmonic/getstarted/) was used as the simulation environment.
 
-To get started with the project, you will need to install the following software on your computer. Below are the required tools and installation instructions:
-
-- **Linux Ubuntu 24.04**: Download and install from the official [Ubuntu website](https://ubuntu.com/blog/tag/ubuntu-24-04-lts).
-- **ROS 2 Jazzy Jalisco**: Follow the instructions on the [ROS 2 release page](https://docs.ros.org/en/rolling/Releases/Release-Jazzy-Jalisco.html) to install.
-- **Gazebo Harmonic**: Use the [Gazebo website](https://gazebosim.org/docs/harmonic/getstarted/) guide to install the simulator.
-
-If your operating system is not Linux Ubuntu 24.04, and you still want to use it to replicate this project, you may need to use a container, such as [Docker](https://www.docker.com/), to set up the environment.
-
-### Installing ROS Packages
-
-Once ROS 2 Jazzy Jalisco is installed, add the required packages by running the following command in your terminal. These packages are necessary for controlling the robot, bridging Gazebo and ROS 2, and managing robot states and configurations:
+After the installation of ROS 2 Jazzy Jalisco, the required packages were installed by executing the following command in the terminal. These packages were used to enable robot control, establish communication between Gazebo and ROS 2, and manage robot state information and configuration parameters:
 
 ```bash
 sudo apt install -y \
@@ -49,36 +131,35 @@ sudo apt install -y \
      ros-jazzy-joy                           
 ```
 
-### Setup the Project
-
-Set up a ROS 2 workspace on your computer if you don't have one. For detailed instructions, refer to the [ROS 2 workspace tutorial](https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html). Here's an example:
+Then, a [ROS 2 workspace](https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html) was created by executing the following commands:
 
 ```bash
-source /opt/ros/jazzy/setup.bash
 mkdir -p ~/workspace/src
 ```
 
-Create a ROS 2 package named **gazebo_ackermann_steering_vehicle** that will use **CMake** as its build system. This package will handle the vehicle's modeling and control, as well as launching the vehicle into Gazebo worlds. You can follow the [ROS 2 package tutorial](https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html) for guidance.  For example, the code below shows a script you can run to create the package and set things up as needed:
+Next, a ROS 2 package named **gazebo_ackermann_steering_vehicle** was created using **CMake** as the build system. This package was used to define the vehicle model, implement control logic, and launch the vehicle within Gazebo simulation environments. The package structure was generated by executing the following commands:
 
 ```bash
 cd ~/workspace/src
+
 ros2 pkg create --build-type ament_cmake gazebo_ackermann_steering_vehicle
 ```
 
-Create the following directories inside the **gazebo_ackermann_steering_vehicle** package:
+Afterward, a set of directories was created within the **gazebo_ackermann_steering_vehicle** package to organize configuration files, launch descriptions, and vehicle model definitions. The directory structure included the following components:
 
-- **config**: This folder will store configuration files, including parameters for the vehicle and the Gazebo bridge configuration.
-- **launch**: This folder will contain the launch files required to start the simulation, load the vehicle model, and set up the required nodes.
-- **model**: This folder will house the robot description files, such as the .xacro or .urdf files, defining the Ackermann steering vehicle's structure and properties.
+- **config**, which was used to store configuration files, including vehicle parameters and Gazebo bridge settings.
+- **launch**, which was used to contain launch files responsible for starting the simulation, loading the vehicle model, and initializing the required nodes.
+- **model**, which was used to store robot description files, such as `.xacro` or `.urdf`, defining the structure and physical properties of the Ackermann steering vehicle.
 
-These directories help organize the package and separate configurations, execution scripts, and model definitions for development and maintenance. For example, you can run the following script to create these directories within the package:
+These directories were created by executing the following commands within the package directory:
 
 ```bash
 cd ~/workspace/src/gazebo_ackermann_steering_vehicle
+
 mkdir -p config launch model
 ```
 
-Therefore, the **gazebo_ackermann_steering_vehicle** package should include the following directory structure for proper organization:
+At this point, the **gazebo_ackermann_steering_vehicle** package had the following directory structure:
 
 ```text
 gazebo_ackermann_steering_vehicle/
@@ -91,41 +172,7 @@ gazebo_ackermann_steering_vehicle/
 ├── package.xml
 ```
 
-Now, update the **package.xml** to include the project dependencies as follows:
-
-```xml
-<?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="3">
-  <name>gazebo_ackermann_steering_vehicle</name>
-  <version>0.0.0</version>
-  <description>A ROS 2 package for simulating an Ackermann steering vehicle. Includes robot modeling, control, and Gazebo simulation integration.</description>
-  <maintainer email="lucasrmazzetto@gmail.com">Lucas Mazzetto</maintainer>
-  <license>Apache License 2.0</license>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
-  
-  <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
-
-  <exec_depend>joint_state_publisher</exec_depend>
-  <exec_depend>robot_state_publisher</exec_depend>
-  <exec_depend>gazebo_ros</exec_depend>
-  <exec_depend>xacro</exec_depend>
-  <exec_depend>ros_gz_bridge</exec_depend>
-  <exec_depend>gz_ros2_control</exec_depend>
-  <exec_depend>ros2_control</exec_depend>
-  <exec_depend>joy</exec_depend>
-
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-
-  <export>
-    <build_type>ament_cmake</build_type>
-  </export>
-</package>
-```
-Also, update the **CMakeLists.txt** file to include the necessary dependencies as well:
+In addition, the **CMakeLists.txt** file was updated to include the required dependencies and directories:
 
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -163,22 +210,58 @@ endif()
 ament_package()
 ```
 
-With the environment set up, we're now ready to start modeling the vehicle and implementing the control system.
+After that, the **package.xml** file was also updated to declare the required project dependencies:
+
+```xml
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>gazebo_ackermann_steering_vehicle</name>
+  <version>0.0.0</version>
+  <description>A ROS 2 package for simulating an Ackermann steering vehicle. Includes robot modeling, control, and Gazebo simulation integration.</description>
+  <maintainer email="lucasrmazzetto@gmail.com">Lucas Mazzetto</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>ros2_control</exec_depend>
+  <exec_depend>joy</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+```
+
+With these steps completed, the environment setup was finalized, and the project was ready to proceed with vehicle modeling and control system development.
 
 ## Methods
 
-This section details the steps to simulate a vehicle with Ackermann steering geometry in Gazebo Harmonic with ROS 2. It covers modeling the vehicle's physical and dynamic properties, implementing ROS 2 nodes to manage the steering angles and wheel velocities, and adding a video game joystick interface for manual operation.
+In this project, a simulated vehicle with Ackermann steering geometry was developed using Gazebo Harmonic and ROS 2. Initially, the vehicle’s structure and dynamic properties were modeled to achieve realistic driving behavior. Subsequently, dedicated ROS 2 nodes were implemented to control steering angles and wheel velocities. Finally, manual operation was enabled through the integration of a video game joystick interface. The following sections describe each stage of the system implementation in detail.
 
 ### Vehicle Modeling
 
-The vehicle model can be designed to be easy to customize and adapt to potential changes throughout the project lifecycle. This project features a scaled version of a full-sized vehicle equipped with an embedded camera. By parametrizing the model's dimensions, it is easily modified for the current project or reused in future applications. The following image shows the vehicle model with these parametrized values:
+The vehicle model was designed to be easily customizable and adaptable to potential changes throughout the project lifecycle. A scaled version of a full-sized vehicle equipped with an embedded camera was implemented, and its main dimensions were defined through parameters to facilitate modification and reuse in future applications. The following image illustrates the vehicle model with the parametrized values applied.
 
 ![Vehicle Parameters]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/vehicle_model_parameters.webp)
 *Figure 1 — Vehicle Model Parameters.*
 
-To define its physical and kinematic properties, the model can be represented using the Unified Robot Description Format (URDF), an XML-based format that specifies components like links, joints, and collision geometries. However, URDF files can become verbose and difficult to maintain due to their lack of support for reusable components. To address this, Xacro (XML Macros) is used to generate the URDF, enabling reusable macros, parameterized definitions, and constants. This approach simplifies maintenance, reduces redundancy, and ensures the model remains flexible for future needs.
+To define the vehicle’s physical and kinematic properties, the model was represented using the Unified Robot Description Format (URDF), an XML-based format used to describe elements such as links, joints, and collision geometries. Due to the limited support for reuse in standard URDF files, Xacro (XML Macros) was employed to generate the final description. This approach enabled the use of reusable macros, parameterized definitions, and constants, thereby simplifying maintenance, reducing redundancy, and preserving flexibility for future modifications.
 
-As previously mentioned, parameters could be used to define the model’s dimensions, but they can also be used for computing the Ackermann steering angles and rear wheel velocities. For consistency and easy access, these parameters can be defined in a shared format used by both the Xacro files and ROS 2 nodes. In this project, create a file named **params.yaml** inside the package’s **config/** directory. Then, add the following content to define the vehicle’s dimensions, kinematic and dynamic properties, and settings for the onboard camera:
+Parameters were used not only to define the model’s dimensions but also to compute the Ackermann steering angles and rear-wheel velocities. To ensure consistency and centralized access, these parameters were defined in a shared configuration format consumed by both the Xacro descriptions and the ROS 2 nodes. For this purpose, a **params.yaml** file was created within the **gazebo_ackermann_steering_vehicle/config** directory to specify the vehicle’s dimensional, kinematic, and dynamic properties, as well as the configuration of the onboard camera. The parameter definitions are provided below:
+
 
 ```yaml
 /**:
@@ -212,7 +295,7 @@ As previously mentioned, parameters could be used to define the model’s dimens
     image_height: 480 # Height of the camera's image output [pixels]
 ```
 
-Create a Xacro file named **vehicle.xacro** in the **model/** directory to define the vehicle's structure and physical properties. It includes details such as mass, inertia, collision geometry, friction, damping, wheel placement, and a mechanism that models front-wheel steering with rear-wheel propulsion. Parameters from **config/params.yaml** will be passed to the model at runtime via the launch file. The file also integrates and configures plugins to interface with external packages and the Gazebo simulator. The contents are shown below:
+A Xacro file named **vehicle.xacro** was created and organized within the **gazebo_ackermann_steering_vehicle/model** directory to define the vehicle’s structural and physical properties, including mass, inertia, collision geometry, friction, damping, wheel placement, and the kinematic configuration for front-wheel steering with rear-wheel traction. Parameters specified in **gazebo_ackermann_steering_vehicle/config/params.yaml** were provided to the model at runtime through the launch system. Additionally, the file integrated and configured the required plugins to interface with external packages and the Gazebo simulator. The file contents are shown below:
 
 ```xml
 <?xml version="1.0"?>
@@ -236,7 +319,7 @@ Create a Xacro file named **vehicle.xacro** in the **model/** directory to defin
   <xacro:arg name="camera_stick_size" default="0.2" />
   <xacro:arg name="camera_height" default="1.5" />
   <xacro:arg name="camera_pitch" default="0.1" />
-  <xacro:arg name="camera_fov" default="90" />
+  <xacro:arg name="camera_fov" default="1.396263" />
   <xacro:arg name="camera_fps" default="30" />
   <xacro:arg name="image_width" default="640" />
   <xacro:arg name="image_height" default="480" />
@@ -576,7 +659,6 @@ Create a Xacro file named **vehicle.xacro** in the **model/** directory to defin
   <joint name="camera_joint" type="fixed">
     <axis xyz="0 1 0" />
     <origin xyz="0.0 ${-camera_box_size/2 - camera_stick_size/2} ${camera_height/2}" rpy="0 ${camera_pitch} 0"/>
-    <origin xyz="0.0 0.0 0.0" rpy="0 ${camera_pitch} 0"/>
     <parent link="camera_stick_link"/>
     <child link="camera_link"/>
   </joint>
@@ -721,9 +803,9 @@ Create a Xacro file named **vehicle.xacro** in the **model/** directory to defin
 </robot>
 ```
 
-Notice the **gazebo** and **ros2_control** tags that define the simulation properties, camera sensor, and the configured plugins in use. Also, note to the arguments in the Xacro file, as they parameterize the vehicle model, with some being essential for vehicle control. For example, specific parameters are crucial to calculate the Ackermann steering angle for each wheel and determine the velocity of the rear wheels.
+The **gazebo** and **ros2_control** tags were used to define the simulation properties, camera sensor, and the configured plugins. In addition, the Xacro file arguments were employed to parameterize the vehicle model, with several of them playing a key role in vehicle control. In particular, specific parameters were required to compute the Ackermann steering angle for each wheel and to determine the rear wheel velocities.
 
-A configuration file is also required for complete integration with Gazebo. This file is used by the **ros_gz** plugin to map ROS topics to Gazebo topics and vice versa, simplifying communication between the simulator and the ROS 2 framework. To set this up, create a file named **ros_gz_bridge.yaml** inside the **config/** directory of your package. Then, add the following content to configure the topic mappings:
+A configuration file was also required to enable full integration with Gazebo. This file was used by the **ros_gz** plugin to map ROS topics to Gazebo topics and vice versa, simplifying communication between the simulator and the ROS 2 framework. For this purpose, a file named **ros_gz_bridge.yaml** was created within the **gazebo_ackermann_steering_vehicle/config** directory to define the required topic mappings. The corresponding configuration is shown below:
 
 ```yaml
 - ros_topic_name: "clock"
@@ -757,7 +839,7 @@ A configuration file is also required for complete integration with Gazebo. This
   direction: "GZ_TO_ROS"
 ```
 
-In addition, another configuration file is needed for this package. It is used with the **gz_ros2_control** package to enable feedforward controllers for both motion and steering. This file defines the controllers and broadcasters responsible for joint control and state feedback, specifying velocity control for the rear wheels and position control for the front steering joints. To set this up, create a file named **gz_ros2_control.yaml** inside the **config/** directory of your package. Then, add the following content to configure the controllers:
+In addition, another configuration file was required for this package to support the **gz_ros2_control** integration. This file was used to configure feedforward controllers for both vehicle motion and steering. It defined the controllers and broadcasters responsible for joint control and state feedback, specifying velocity control for the rear wheels and position control for the front-steering joints. For this purpose, a file named **gz_ros2_control.yaml** was also created within the **gazebo_ackermann_steering_vehicle/config** directory to declare the controller configurations. The contents of this file are shown below:
 
 ```yaml
 controller_manager:
@@ -798,9 +880,7 @@ forward_position_controller:
       - velocity
 ```
 
-To bring everything together, a ROS launch file can be used. A ROS launch file automates the process of starting nodes and setting parameters in a ROS environment. It defines nodes, parameters, and other settings in a structured manner, simplifying the coordination of various components within a robotic system. In ROS 2, launch files are typically written in Python, offering greater flexibility and the ability to include dynamic behavior, such as conditionals and loops.
-
-To set up the simulation, you can create a launch file that reads configuration files, loads the robot description, and starts the Gazebo simulator. To make the file more flexible and reusable, you can allow the world used in the simulation and the vehicle's initial pose to be passed as arguments. This way, the launch file becomes adaptable to different simulation scenarios. Create a **vehicle.launch.py** file inside the **launch/** directory to integrate everything. Add the following content to launch the vehicle in Gazebo:
+To bring the entire system together, a ROS 2 launch file was created to automate node startup, parameter loading, and the initialization of the Gazebo simulator. The launch file organized nodes and runtime settings in a clear and structured way, simplifying overall system integration. Implemented in Python, it also allowed additional flexibility, such as passing the simulation world and the vehicle’s initial pose as launch arguments. For this purpose, a **vehicle.launch.py** file was created and organized within the **gazebo_ackermann_steering_vehicle/launch** directory, and its contents used to start the simulation are shown below:
 
 ```python
 import os
@@ -975,9 +1055,8 @@ def generate_launch_description():
     return launch_description
 ```
 
-With all configuration and launch files in place, the vehicle is fully modeled and integrated with the simulator and control systems. The simulation environment is now ready to run.
+With all configuration and launch files in place, the vehicle model was fully integrated with the simulator and control systems, completing the simulation setup. To run the ROS 2 application, the environment was initialized by sourcing the ROS 2 Jazzy setup file, building the workspace to compile the required packages, and sourcing the workspace setup file to make the packages available. Finally, the application was launched to start the simulation. The commands used for these steps are shown below:
 
-To set up and launch the ROS 2 application, start by sourcing the ROS 2 Jazzy setup file. Navigate to the workspace, build it to compile the code and dependencies, and then source the workspace’s setup file to make the packages accessible. Finally, launch the application to start the simulation. Below is the script for these steps:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -991,122 +1070,31 @@ source install/setup.bash
 ros2 launch gazebo_ackermann_steering_vehicle vehicle.launch.py
 ```
 
-If everything runs correctly, after launching **vehicle.launch.py** the Gazebo simulator will open and spawn the vehicle described by the Xacro file. The vehicle should then be visible in the simulation, as shown in the following image:
+Once the setup was executed successfully, launching **vehicle.launch.py** started the Gazebo simulator and spawned the vehicle defined by the Xacro model. The vehicle then appeared in the simulation environment and could be observed within the Gazebo world, as shown in the image below:
 
 ![Ackermann Steering Vehicle Model in Gazebo Simulation]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/ackermann_steering_vehicle_model_in_gazebo_simulation.gif)
 *Figure 2 — Ackermann Steering Vehicle Model in Gazebo Simulation.*
 
-To launch the robot in a specified world with a custom initial pose, the **vehicle.launch.py** file should be executed, providing the world path and robot pose arguments. These arguments include the world file path, the initial x, y, and z coordinates of the robot, as well as the initial roll (R), pitch (P), and yaw (Y) orientations. For example, in the given setup bellow, the robot starts at position (x, y, z) = (1.0, 2.0, 0.5) with a yaw of 1.57 radians in the specified world:
+To start the vehicle in a specific simulation world with a custom initial pose, the **vehicle.launch.py** file was executed with the appropriate launch arguments. These arguments specified the world file path, the initial **x**, **y**, and **z** position of the vehicle, and the initial roll (**R**), pitch (**P**), and yaw (**Y**) orientation. In the example shown below, the vehicle was initialized at position (**x**, **y**, **z**) = (1.0, 2.0, 0.5) with a yaw angle of 1.57 radians in the selected world:
 
 ``` bash
 ros2 launch gazebo_ackermann_steering_vehicle vehicle.launch.py world:=world.sdf x:=1.0 y:=2.0 z:=0.5 R:=0.0 P:=0.0 Y:=1.57
 ```
 
-### Ackermann Steering Geometry
-
-Ackermann steering geometry is a steering system that ensures smooth turning by aligning the wheels' angles so the inside and outside wheels follow different circular paths. This is achieved by turning the inside wheel more than the outside, accounting for their varying radii during a turn. To achieve this, the geometry adjusts the steering angles so that all wheels point toward a common turning center, reducing tire wear and preventing slipping. This is particularly important for vehicles with four wheels, as improper alignment during turns can compromise stability and handling.
-
-
-![Ackermann Steering Geometry]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/ackermann_steering.webp)
-*Figure 3 — Ackermann Steering Geometry.*
-
-
-Considering that the base steering angle $$\phi$$ represents desired wheel steering angle in the bicycle model of the vehicle, the individual steering angles of the inner and outer wheels can be determined by examining the geometry of three triangles. These triangles are formed using the following vehicle parameters: track width $$w$$ (lateral wheel distance), wheelbase $$l$$ (longitudinal axle distance), base $$\phi$$, inner $$\phi_{i}$$​ and outer $$\phi_{o}$$ wheel steering angles, and the distance $$r$$ from the instantaneous center of curvature to the vehicle's center. 
-
-$$
-tan(\phi) = \frac{l}{r}
-$$
-
-$$
-tan(\phi_{i}) = \frac{l}{(r - \frac{w}{2})}
-$$
-
-$$
-tan(\phi_{o}) = \frac{l}{(r + \frac{w}{2})}
-$$
-
-Then, subtracting the reciprocals of the latter two equations leads to the derivation of the Ackermann steering equation:
-
-$$
-\frac{1}{tan(\phi_{o})} - \frac{1}{tan(\phi_{i})} = cot(\phi_{o}) - cot(\phi_{i}) = \frac{(r + \frac{w}{2})}{l} - \frac{(r - \frac{w}{2})}{l} = \frac{w}{l}
-$$
-
-Alternatively, the two cotangents can be represented in terms of the base angle $$\phi$$ as follows:
-
-$$
-cot(\phi_{i}) - cot(\phi) = \frac{(r - \frac{w}{2})}{l} - \frac{r}{l} = -\frac{w}{2l} \Longleftrightarrow cot(\phi_{i}) = cot(\phi) - \frac{w}{2l}
-$$
-
-$$
-cot(\phi_{o}) - cot(\phi) = \frac{(r + \frac{w}{2})}{l} - \frac{r}{l} = +\frac{w}{2l} \Longleftrightarrow cot(\phi_{o}) = cot(\phi) + \frac{w}{2l}
-$$
-
-These equations encounter a limitation when $$\phi=0$$, since $$cot⁡(0)$$ is undefined. To address this issue, it is possible use the trigonometric identity $$cot(⁡α)=\frac{cos⁡(α)}{sin⁡(α)}$$ to reformulate the equations, ensuring they remain valid under this condition. The revised equations for the inner and outer wheel steering angles are:
-
-$$
-\phi_{i} = tan^{-1} \left( \frac{2 \cdot l \cdot sin(\phi)}{2 \cdot l \cdot cos(\phi) - w \cdot sin(\phi)} \right)
-$$
-
-$$
-\phi_{o} = tan^{-1} \left( \frac{2 \cdot l \cdot sin(\phi)}{2 \cdot l \cdot cos(\phi) + w \cdot sin(\phi)} \right)
-$$
-
-Hence, it becomes possible to calculate the steering angles of the inner and outer wheels based on the desired base angle, following Ackermann steering geometry principles.
-
-### Rear Differential Model
-
-Furthermore, it is also important to consider the velocity of the rear wheels for an accurate steering model. Each rear wheel follows a circular path with a different radius, meaning that while the angular velocity of both wheels remains the same, the linear velocity of the outer wheel will be greater than that of the inner wheel. In real vehicles, this is usually addressed by a mechanical rear differential, which allows the rear wheels to rotate at different speeds, preventing tire slippage.
-
-![Rear Differential Model]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/rear_differential.webp)
-*Figure 4 — Rear Differential Model.*
-
-Considering the base velocity $$v$$ of the vehicle as a reference, the velocities of the inner ($$v_i$$​) and outer ($$v_o$$​) rear wheels are derived based on the geometry of circular motion. Thus, using the bicycle model, the radius of curvature $$r$$ is defined as:
-
-$$
-r = \frac{l}{tan(\phi)}
-$$
-
-Therefore, the inner and outer rear wheel paths lie on circles of radii:
-
-$$
-r_i = r - \frac{w}{l}
-$$
-
-$$
-r_o = r + \frac{w}{l}
-$$
-
-Considering $$\omega$$ as the angular velocity of the vehicle, then the linear velocities $$v_i$$ and $$v_o$$ of the rear wheels are directly related to $$\omega$$. The relationship is expressed as:
-
-$$
-\omega = \frac{v}{r} = \frac{v_i}{r_i} = \frac{v_o}{r_o} \Longleftrightarrow \omega = \frac{v_i}{(r - \frac{w}{l})} = \frac{v_o}{(r + \frac{w}{l})}
-$$
-
-Then the linear velocities $$v_i$$ and $$v_o$$ of the rear wheels can be defined as:
-
-$$
-v_i = \omega \cdot \left(r - \frac{w}{2}\right) = \frac{v}{r} \cdot \left(r - \frac{w}{2}\right) = \frac{v}{(\frac{l}{tan(\phi)})} \cdot \left(\frac{l}{tan(\phi)} - \frac{w}{2}\right)
-$$
-
-$$
-v_o = \omega \cdot \left(r + \frac{w}{2} \right) = \frac{v}{r} \cdot \left(r + \frac{w}{2}\right) = \frac{v}{(\frac{l}{tan(\phi)})} \cdot \left(\frac{l}{tan(\phi)} + \frac{w}{2}\right)
-$$
-
-This analysis enables the calculation of each rear wheel's velocity based on the steering angle and vehicle speed, ensuring proper steering by considering the differing radii of their circular paths. With this rear differential model, combined with the Ackermann steering geometry derived earlier, the vehicle simulation will avoid tire slippage and steer as a good real vehicle would.
-
 ### Vehicle Control
 
-As referenced earlier, the **gz_ros2_control** package is used to control the vehicle's joints with feedforward controllers. These controllers predict and adjust the system’s behavior proactively using input data, applying corrective actions before changes occur. This package allows developers to focus on developing the vehicle behaviour, without the need for direct control of each joint. By passing the required values to the **gz_ros2_control** interface, the package handles the low-level control.
+The **gz_ros2_control** package was used to control the vehicle’s joints through feedforward controllers, allowing vehicle behavior to be implemented without direct management of individual joints, as low-level actuation was handled internally by the **gz_ros2_control**.
 
-The **gz_ros2_control.yaml** file, located in the the **config/** directory, sets up two feedforward controllers: **forward_velocity_controller**, responsible for managing the rear wheel motion, and **forward_position_controller**, which handles the front steering joints. These controllers are connected to the ROS 2 by the topics **/forward_velocity_controller/commands** and **/forward_position_controller/commands**, allowing direct control of vehicle motion and steering within the ROS 2 interface. Each topic receives a **Float64MultiArray** containing the desired position or desired velocity values for each joint, in the order specified in the file. Since the vehicle follows the Ackermann steering geometry with a differential rear model, a control interface is needed to convert the desired vehicle angle and vehicle velocity into individual desired joint positions and joint velocities. 
 
-Therefore, a node must be implemented to subscribe to two new topics, **/steering_angle** and **/velocity**, which provide the desired steering angle (in radians) and velocity (in m/s) for the vehicle, respectively. This node will then convert these values into the required joint positions and velocities based on the Ackermann steering geometry and the differential rear model derived earlier. Finally, the node will publish the calculated results to the **/forward_position_controller/commands** and **/forward_velocity_controller/commands** topics from  **gz_ros2_control** package.
+The **gz_ros2_control.yaml** file, located in the **gazebo_ackermann_steering_vehicle/config** directory, was configured to define two different feedforward controllers: **forward_velocity_controller**, responsible for controlling the rear wheel motion, and **forward_position_controller**, which managed the front steering joints. These controllers were connected to the ROS 2 interface through the **/forward_velocity_controller/commands** and **/forward_position_controller/commands** topics, enabling direct control of vehicle motion and steering. Each topic received a **Float64MultiArray** message containing the desired velocity or position values for the corresponding joints, ordered as specified in the configuration file. Because the vehicle followed an Ackermann steering geometry with a differential rear-wheel model, a control interface was also needed to convert the desired vehicle steering angle and velocity into the appropriate joint positions and joint velocities.
 
-Moving on, the track width and wheelbase are necessary to calculate the Ackermann steering angles for each wheel. These values are determined using parameters from the **config/params.yaml** file, which define the vehicle's body width, body length, wheel width, and wheel radius. Additionally, the maximum steering angle and maximum velocity are also needed, to constrain the controller computations to these values. So, the parameters must also be provided to the node to load these values.
+As a result, a dedicated ROS 2 node was implemented to subscribe to the **/steering_angle** and **/velocity** topics, which provided the desired vehicle steering angle (in radians) and linear velocity (in m/s), respectively. The node processed these inputs to compute the corresponding joint positions and joint velocities according to the Ackermann steering geometry and the differential rear-wheel model defined earlier. The computed joint positions and velocities were then published to the **/forward_position_controller/commands** and **/forward_velocity_controller/commands** topics exposed by the **gz_ros2_control** package.
 
-Another feature needed for safety is a timeout mechanism. If the subscribed topics stop receiving a desired angle or velocity after a specified period, the vehicle must stop until the topics are  published again. While this is a simulation where system failures are not a concern, implementing this feature is still important because it ensures consistency if the same code is ever shared or reused with a real vehicle.
+Moving on, the track width and wheelbase were required to compute the Ackermann steering angles for each wheel. These values were derived from parameters defined in the **gazebo_ackermann_steering_vehicle/config/params.yaml** file, which specified the vehicle body width, body length, wheel width, and wheel radius. In addition, the maximum steering angle and maximum allowable velocity were used to constrain the controller computations. For this reason, these parameters were also loaded by the node to ensure consistent and bounded control behavior.
 
-To implement this node, start by navigating to the **include/** folder and creating the **vehicle_controller.hpp** header file. In this file, declare the function signatures for **ackermann_steering_angle**, which calculates the steering angle for each wheel using Ackermann geometry, and **rear_differential_velocity**, which computes the rear wheel velocities based on the differential model. Also include the **timer_callback** function, which publishes these values to the **gz_ros2_control** package, and the **steering_angle_callback** and **velocity_callback** functions, which handle incoming messages from the **/steering_angle** and **/velocity** topics, respectively. The complete header file code is shown next:
+An additional safety feature was implemented in the form of a timeout mechanism. If updated steering angle or velocity commands were not received within a specified time interval, the vehicle was commanded to stop until new commands became available. Although the system operated in a simulated environment where hardware failures were not a concern, this mechanism was included to maintain consistent behavior and to support potential reuse of the same control logic on a real vehicle.
+
+To implement this node, a header file named **vehicle_controller.hpp** was created within the **gazebo_ackermann_steering_vehicle/include** directory. This file declared the function interfaces **ackermann_steering_angle**, used to compute the steering angle for each wheel based on Ackermann geometry, and **rear_differential_velocity**, responsible for calculating the rear wheel velocities according to the differential model. It also defined the **timer_callback** function for publishing control commands to the **gz_ros2_control** interface, along with the **steering_angle_callback** and **velocity_callback** functions for processing incoming messages from the **/steering_angle** and **/velocity** topics, respectively. The complete header file is shown below:
 
 ```cpp
 #ifndef VEHICLE_CONTROLLER_HPP
@@ -1213,7 +1201,7 @@ private:
 #endif  // VEHICLE_CONTROLLER_HPP
 ```
 
-With the header file and function signatures defined, it's time to create the node implementation. Begin by creating a new file named **vehicle_controller.cpp** inside the **src/** folder of the package. This file contains the actual logic behind the **VehicleController** class methods declared earlier. In this implementation, the node must retrieve the necessary parameters for the computations, process incoming steering angle and velocity, compute the appropriate steering angles and wheel speeds based on the Ackermann steering model, and publish the commands at a fixed rate. A timeout mechanism also stop the vehicle safely if updates stop coming in. These features come together in the code below:
+With the header file and function interfaces defined, the node implementation was completed. A source file named **vehicle_controller.cpp** was created within the **gazebo_ackermann_steering_vehicle/src** directory to implement the logic of the **VehicleController** class. In this implementation, the node loaded the required parameters, processed incoming steering angle and velocity commands, computed the corresponding steering angles and wheel speeds using the Ackermann steering model, and published control commands at a fixed rate. The timeout mechanism was also included to safely stop the vehicle when command updates were no longer received. These elements are combined in the implementation shown below:
 
 ```cpp
 #include "vehicle_controller.hpp"
@@ -1418,7 +1406,7 @@ int main(int argc, char** argv)
 }
 ```
 
-To ensure proper integration, it is necessary to update the **launch/vehicle.launch.py** file to launch the **vehicle_controller** node alongside the vehicle simulation. Additionally, the launch file must be modified to pass the parameters to the **vehicle_controller** node. These changes are shown below: 
+To ensure proper integration of the system, the **gazebo_ackermann_steering_vehicle/launch/vehicle.launch.py** file was updated to start the **vehicle_controller** node alongside the vehicle simulation. In addition, the launch configuration was modified to pass the required parameters to the **vehicle_controller** node. These updates are shown below:
 
 ```python
 import os
@@ -1613,7 +1601,7 @@ def generate_launch_description():
     return launch_description
 ```
 
-Finally, it is necessary to update the **CMakeLists.txt** file to include this node as a dependency to the **gazebo_ackermann_steering_vehicle** package:
+Finally, the **CMakeLists.txt** file was updated to include the **vehicle_controller** node as a build dependency of the **gazebo_ackermann_steering_vehicle** package:
 
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -1659,8 +1647,7 @@ endif()
 ament_package()
 ```
 
-With this implementation, the vehicle control interface is complete. All the considerations discussed are now in place to effectively control the vehicle using the Ackermann steering model. To proceed, build the **gazebo_ackermann_steering_vehicle** package and launch **vehicle.launch.py** by running the following commands in your workspace:
-
+With this implementation, the vehicle control interface was completed, incorporating all the elements required to control the vehicle using the Ackermann steering model. To proceed, the **gazebo_ackermann_steering_vehicle** package was built and **vehicle.launch.py** was executed by running the following commands in the workspace:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -1674,9 +1661,9 @@ source install/setup.bash
 ros2 launch gazebo_ackermann_steering_vehicle vehicle.launch.py
 ```
 
-In conclusion, if all steps were followed correctly, after launching the vehicle using the **vehicle.launch.py** file, the **/steering_angle** and **/velocity** topics will be available for controlling the vehicle. At this point, by opening a new command line and sourcing the ros environtment, it is possible to send commands to the vehicle via these topics. 
+In conclusion, once the vehicle is launched using the **vehicle.launch.py** file, the **/steering_angle** and **/velocity** topics become available to control the vehicle. From there, opening a new terminal, sourcing the ROS environment, and publishing messages to these topics allows direct control of the vehicle’s motion and steering.
 
-For instance, open two new command lines and in each one source the ROS 2 Jazzy setup file and source the environment setup file:
+For instance, two new command lines were opened, and in each one the ROS 2 Jazzy setup file and the workspace environment setup file were sourced, as shown below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -1686,33 +1673,34 @@ cd ~/workspace
 source install/setup.bash
 ```
 
-After that, in the first command line, publish the desired vehicle's steering angle:
+After that, in the first command line, the desired vehicle steering angle was published.
 
 ```bash
 ros2 topic pub /steering_angle std_msgs/msg/Float64 "{data: 0.5}" --rate 10
 ```
 
-In the other one, publish the desired vehicle's velocity:
+In the other one, the desired vehicle's velocity was published:
 
 ```bash
 ros2 topic pub /velocity std_msgs/msg/Float64 "{data: 0.5}" --rate 10
 ```
 
-After publishing the desired steering angle and velocity to the vehicle controller node, the vehicle begins to follow a circular path, as illustrated in the following image:
+After the desired steering angle and velocity were published to the vehicle controller node, the vehicle began moving and followed a circular path in the simulation, as illustrated in the image below:
 
 ![Ackermann Steering Vehicle Control in Simulation]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/ackermann_steering_vehicle_control.gif)
 *Figure 5 — Ackermann Steering Vehicle Control in Simulation.*
 
 ### Joystick Controller
 
-In many robotics and simulation workflows, having manual control over the vehicle is just as important as autonomous functionality. Whether you're testing control algorithms, validating system behavior, or collecting training data for Deep Learning projects, the ability to drive the vehicle manually adds flexibility to your setup.
+In many robotics and simulation workflows, having manual control over the vehicle is just as important as autonomous functionality. Whether you're testing control algorithms, validating system behavior, or collecting training data for Deep Learning projects, the ability to drive the vehicle manually adds flexibility to the setup.
 
-To support this, a joystick control interface is provided, allowing users to steer and adjust the vehicle’s velocity using an Xbox One wireless controller. The analog sticks "L3" and "R3" are mapped to steering and throttle control, respectively, as illustrated in the image below. If you're using a different joystick model, you may need to adapt the software to account for variations in key mappings, which can differ across devices.
+To support this, a joystick-based control interface was implemented, enabling users to steer the vehicle and adjust its velocity using an Xbox One wireless controller. In this setup, the **L3** analog stick was mapped to steering input, while the **R3** stick was used for throttle control, as shown in the image below. When using a different joystick model, software adjustments may be required, as button and axis mappings can vary between devices.
 
 ![Ackermann Steering Vehicle Control in Simulation]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/xbox_joystick_controller.webp)
 *Figure 6 — Xbox Joystick Controller.*
 
-To implement joystick-based control, navigate to the **include/** directory and create the **joystick_controller.hpp** header file. In this file, define the **JoystickController** class, which will subscribe to joystick input messages and publish the corresponding steering and velocity commands. This class defines the node responsible for interpreting joystick input and translating it into steering and velocity commands for the vehicle. The complete header file code is shown below:
+To add joystick-based control, the **gazebo_ackermann_steering_vehicle/include** directory was updated by creating the **joystick_controller.hpp** header file. This file defined the **JoystickController** class, responsible for subscribing to joystick input messages and publishing the corresponding steering angle and velocity commands. In practice, this node handled the interpretation of joystick inputs and translated them into commands used to drive the vehicle. The complete header file implementation is shown below.
+
 
 ```cpp
 #ifndef JOY_CONTROLLER_HPP
@@ -1765,7 +1753,8 @@ private:
 #endif  // JOY_CONTROLLER_HPP
 ```
 
-Now, go to the **src/** directory and create the **joystick_controller.cpp** file to implement the joystick control node. This node subscribes to the **/joy** topic to read joystick inputs and loads parameters from **config/params.yaml** during initialization. The left and right stick axes control the steering angle and velocity as fractions of their maximum values. A **timer_callback** function periodically publishes these commands to the **/steering_angle** and **/velocity** topics. The complete source code is shown below:
+Next, the **gazebo_ackermann_steering_vehicle/src** directory was updated by creating the **joystick_controller.cpp** file to implement the joystick control node. This node subscribed to the **/joy** topic to read joystick input messages and loaded the required parameters from **gazebo_ackermann_steering_vehicle/config/params.yaml** during initialization. The left and right analog stick axes were used to control the steering angle and vehicle velocity as scaled fractions of their respective maximum values. A **timer_callback** function was also implemented to periodically publish these commands to the **/steering_angle** and **/velocity** topics. The complete source code implementation is shown below.
+
 
 ```cpp
 #include "joystick_controller.hpp"
@@ -1827,7 +1816,7 @@ int main(int argc, char** argv)
 }
 ```
 
-Next, create a launch file inside the **launch/** directory named **joystick.launch.py**. This file starts two nodes: the **joy_node** from the **joy** package, which reads input from the joystick and publishes it on the **/joy** topic, and the **joystick_controller** node from your package, which translates joystick input into steering and velocity commands. The **joystick_controller** also loads parameters from **config/parameters.yaml** to ensure proper control behavior. The code below defines the launch setup. It first retrieves the parameter file path, then launches both nodes with the required configuration:
+Then, a launch file named **joystick.launch.py** was created inside the **gazebo_ackermann_steering_vehicle/launch** directory. This file was used to start two nodes: the **joy_node** from the **joy** package, responsible for reading joystick input and publishing it on the **/joy** topic, and the **joystick_controller** node from this package, which converted joystick input into steering and velocity commands. The **joystick_controller** node also loaded parameters from **gazebo_ackermann_steering_vehicle/config/parameters.yaml** to ensure correct control behavior. The launch configuration retrieved the parameter file path and then started both nodes with the required settings, as shown below.
 
 ```python
 import os
@@ -1856,7 +1845,7 @@ def generate_launch_description():
                               joystick_controller_node])
 ```
 
-Additionally, modify the **CMakeLists.txt** file to include the required dependencies:
+Additionally, the **CMakeLists.txt** file was updated to include the required dependencies needed for the joystick control functionality.
 
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -1906,7 +1895,7 @@ endif()
 ament_package()
 ```
 
-With this node implemented, the vehicle simulation can now be manually controlled using a joystick. To use the controller, first launch the **vehicle.launch.py** file. Then, in a separate terminal, launch the **joystick.launch.py** file as follows:
+With this node in place, the vehicle simulation could now be driven manually using a joystick. To use the controller, the **vehicle.launch.py** file was launched first. Then, in a separate terminal, the **joystick.launch.py** file was started to enable joystick-based control, as shown below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -1920,43 +1909,41 @@ source install/setup.bash
 ros2 launch gazebo_ackermann_steering_vehicle joystick.launch.py
 ```
 
-It is now possible to control the vehicle in the simulation using an Xbox One controller, employing its buttons and joysticks designed for handling the robot. The **gazebo_ackermann_steering_vehicle**  package is now complete, managing vehicle simulation, control, and manual operation. The final package structure should look like the following:
+It was now possible to control the vehicle in the simulation using an Xbox One controller, taking advantage of its joysticks to drive and steer the robot. At this stage, the **gazebo_ackermann_steering_vehicle** package was complete, bringing together vehicle simulation, control logic, and manual operation. The final structure of the package is shown below:
 
 ```text
 gazebo_ackermann_steering_vehicle/
 ├── config/
 │   ├── gz_ros2_control.yaml
 │   ├── parameters.yaml
-│   ├── ros_gz_bridge.yaml
+│   └── ros_gz_bridge.yaml
 ├── include/
 │   ├── joystick_controller.hpp
-│   ├── vehicle_controller.hpp
+│   └── vehicle_controller.hpp
 ├── launch/
 │   ├── joystick.launch.py
-│   ├── vehicle.launch.py
+│   └── vehicle.launch.py
 ├── model/
-│   ├── vehicle.xacro
+│   └── vehicle.xacro
 ├── src/
 │   ├── joystick_controller.cpp
-│   ├── vehicle_controller.cpp
+│   └── vehicle_controller.cpp
 ├── CMakeLists.txt
-├── package.xml
+└── package.xml
 ```
 
 ## Results
 
-While setting up the simulation required configuring many files and integrating various packages, the result is a fully functional system. After connecting the joystick controller, the vehicle can now be controlled using a video game joystick.
+Although setting up the simulation required configuring multiple files and integrating several packages, the final result was a fully functional system. Once the joystick controller was connected, the vehicle could be driven interactively using a video game controller.
 
 ![Vehicle Simulation and Control]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/vehicle_simulation_and_control.gif)
 *Figure 7 — Vehicle Simulation and Control.*
 
-There are a few additional topics not covered earlier, but which play an important role in the system. The **joint_states** topic publishes a **sensor_msgs/msg/JointState** message, representing the robot's state, and can be used for various applications, such as visualizing the robot in software like **RViz**. Additionally, the **camera/image_raw** topic publishes a **sensor_msgs/msg/Image** message, which contains the image captured by the onboard camera. This can be leveraged to test computer vision algorithms or to train machine learning models for tasks such as object detection or navigation.
+In addition to the topics discussed earlier, the system also provides the **joint_states** topic, which publishes **sensor_msgs/msg/JointState** messages describing the current state of the robot’s joints and can be used for monitoring or visualization in tools such as **RViz**, as well as the **camera/image_raw** topic, which publishes **sensor_msgs/msg/Image** messages from the onboard camera and can be leveraged for computer vision experiments or for training machine learning models for tasks like object detection and navigation.
 
 ![Vehicle Visualization in RViz]({{ site.url }}{{ site.baseurl }}/public/images/ackermann-steering-vehicle-simulation/vehicle_visualization_in_rviz.gif)
 *Figure 8 — Vehicle Visualization in RViz.*
 
 ## Conclusion
 
-The simulation of an Ackermann steering vehicle using Gazebo Harmonic and ROS 2 Jazzy Jalisco highlights the advantages of modern robotics tools. Gazebo Harmonic provides a lightweight yet powerful open-source simulation environment, while the ROS 2 framework simplifies the integration of various software packages, making it easy to build modular and scalable robotic systems. 
-
-By modeling the vehicle in a virtual environment, this project makes it easy to test control algorithms and simulate realistic driving without physical hardware. It can also be used in future projects to develop and test AI and navigation systems, serving as a starting point for more advanced applications.
+The simulation of an Ackermann steering vehicle using Gazebo Harmonic and ROS 2 Jazzy Jalisco demonstrates the strengths of robotics tools, combining a lightweight yet capable simulation environment with a modular and scalable framework. By modeling the vehicle in a virtual setting, the project enables safe and efficient testing of control algorithms and realistic driving scenarios without physical hardware, while also providing a solid foundation for future work in perception and autonomous navigation.
