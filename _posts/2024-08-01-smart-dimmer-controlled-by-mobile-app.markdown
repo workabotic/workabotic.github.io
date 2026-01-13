@@ -1,25 +1,26 @@
 ---
 title: "Smart Dimmer Controlled by Mobile App"
 date: 2024-08-01 18:00:00
-description: A smart dimmer system built using an ESP32 microcontroller, controlled via a mobile app to adjust the brightness of an incandescent bulb.
+description: A smart dimmer system built using an ESP32 microcontroller, controlled via a mobile app to adjust the brightness of an incandescent light bulb.
 author: lucasmazz
-keywords: android, microcontroller, embedded, microcontroller, IoT, espressif, ESP32, esp32, esp-idf, RTOS, FreeRTOS, dimmer, TRIAC, mobile app, automation, smart home, dimmer circuit, home automation, Wi-Fi dimmer, electronics, embedded systems, electrical engineering, DIY.
+keywords: android, microcontroller, embedded, IoT, espressif, ESP32, esp32, esp-idf, RTOS, FreeRTOS, dimmer, TRIAC, mobile app, automation, smart home, dimmer circuit, home automation, Wi-Fi dimmer, electronics, embedded systems, electrical engineering, DIY.
 ---
+
+This project develops a smart dimmer system for controlling the brightness of an incandescent light bulb via a mobile app. Built on an ESP32, it uses phase control with a zero-crossing detection circuit and a TRIAC-based power stage for AC waveform synchronization. The work includes hardware design, embedded firmware with ESP-IDF, and an Android app communicating through a web server.
+
+## Introduction 
 
 Dimmers are electronic devices typically connected to lights to control their brightness. Similar circuits can also be used in various applications, such as controlling the speed of an electric motor or setting the temperature of an electric oven. The basic idea is to limit the power supplied from a source to the load by altering the waveform of the applied voltage.
 
 The key component used to achieve this goal is the TRIAC. This electronic component has three terminals: one called the "gate," which is responsible for allowing or blocking the passage of current through the other two terminals. By default, the TRIAC operates as an open circuit, preventing current flow. However, when the gate is triggered, the component behaves like a closed switch, allowing current to flow and providing power to the load until the next cycle of the supply waveform.
 
-For example, when considering a lamp as the load, it is possible to allow only a portion of the current to flow to it, thus regulating the light brightness. To control the brightness as desired, it is necessary to trigger the TRIAC gate at the appropriate time. If the gate is triggered too early, full power will be supplied to the lamp, causing it to glow very brightly. On the other hand, if the gate is triggered too late, the light will be very dim or may even go out. It is important to note that this dimmer design is specifically intended for use with incandescent light bulbs and may not perform well with LED lights due to inherent differences in their construction.
+For example, when considering a light bulb as the load, it is possible to allow only a portion of the current to flow to it, thus regulating the light brightness. To control the brightness as desired, it is necessary to trigger the TRIAC gate at the appropriate time. If the gate is triggered too early, full power will be supplied to the light bulb, causing it to glow very brightly. On the other hand, if the gate is triggered too late, the light will be very dim or may even go out. It is important to note that this dimmer design is specifically intended for use with incandescent light bulbs and may not perform well with LED lights due to inherent differences in their construction.
 
-Before start, be careful if you want to replicate this project. This circuit uses voltages that can cause serious injury. If you don’t have experience with electricity, look for someone who can help you with the circuit. It would also be nice to have an oscilloscope, to check the waveforms and verify that everything is working correctly.
-
-![Smart dimmer controlled by mobile app]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/smart_dimmer_controlled_by_mobile_app.webp)
-*Figure 1 — Smart dimmer controlled by mobile app.*
+For this project, an oscilloscope was used to analyze signal waveforms during development, allowing verification of timing, voltage levels, and overall behavior, which supported debugging and software refinement. The complete project source code is available on [GitHub](https://github.com/workabotic/smart_dimmer_controlled_by_mobile_app) and can be cloned, reviewed, modified, or reused, with contributions and suggestions for improvement welcome.
 
 ## Materials
 
-The list of components used in this project are listed below:
+The components used in this project are listed below:
 
 - 1x ESP32 microcontroller
 - 1x TRIAC
@@ -29,46 +30,48 @@ The list of components used in this project are listed below:
 - 4x diodes
 - 2x 100 Ω resistors
 - 1x 330 Ω resistor
-- 1x 10K Ω resistor
+- 1x 10 kΩ resistor
 
 
-## Overview
+## Methods
 
-The main idea is to trigger the TRIAC using an ESP32 microcontroller, which is a relatively cheap device capable of connecting to Wi-Fi and Bluetooth without any external needs. Moreover, It features a 32-bit dual-core processor and offers low power consumption, making it a robust solution for diverse IoT applications and an excellent option for simple embedded systems. The development board used in the prototype is a DOIT ESP32 Devkit V1. This project utilizes the Espressif IoT Development Framework (ESP-IDF) to code and program the device. Additionally, Android Studio is used to develop the Android mobile app, which interfaces with the ESP32 and sends commands with the desired brightness.
+The main objective of this project was to trigger a TRIAC using an ESP32 microcontroller, a low-cost device capable of Wi-Fi and Bluetooth connectivity without external components. The ESP32, which features a 32-bit dual-core processor and low power consumption, was selected as a solution suitable for IoT applications and simple embedded systems. The prototype was developed using a DOIT ESP32 Devkit V1 board. The embedded firmware was implemented using the Espressif IoT Development Framework (ESP-IDF), while the Android mobile application was developed with Android Studio and used to interface with the ESP32 by sending brightness control commands.
 
-A transformer is used to reduce the power voltage to around 12 V peak-to-peak AC. Four diodes in a bridge rectifier configuration to convert the stepped-down AC voltage from the transformer into about 6 V DC. More importantly, they provide a positive voltage for the zero-crossing detector circuit to function, which detects the AC power wave's zero-crossing, which is crucial for timing the TRIAC and controlling dimming.
+A transformer was used to step down the mains voltage to approximately 12 V peak-to-peak AC. This reduced AC voltage was then rectified using four diodes arranged in a bridge rectifier configuration, producing an output of approximately 6 V DC. In addition to rectification, this stage provided a stable positive voltage required for the zero-crossing detection circuit, which was used to detect the zero crossings of the AC waveform. Accurate zero-crossing detection was essential for proper TRIAC timing and precise dimming control.
 
-A 10k resistor acts as a pull-up resistor in the microcontroller input, ensuring stable logic levels. The other resistors listed in the materials are used for current limiting and protection in various parts of the circuit, ensuring that components function within their safe current ratings. The 4N25 optocoupler is used for zero-crossing detection and electrical isolation between the microcontroller and the low voltage DC side. The MOC3021 optocoupler interfaces with the TRIAC, isolating and driving it so the ESP32's low voltage signals can safely trigger the high voltage TRIAC to switch the AC load on and off.
+A 10 kΩ resistor was used as a pull-up on a microcontroller input to ensure stable logic levels. The remaining resistors specified in the materials list were employed for current limiting and protection in different parts of the circuit, ensuring that all components operated within their safe current ratings. A 4N25 optocoupler was used for zero-crossing detection and to provide electrical isolation between the microcontroller and the low-voltage DC circuitry. The MOC3021 optocoupler was used to interface with the TRIAC, providing isolation and drive capability so that the ESP32’s low-voltage control signals could safely trigger the high-voltage TRIAC and switch the AC load.
 
-In summary, the ESP32 receives zero-crossing detection signals from the 4N25 optocoupler, which outputs a high signal when the power grid wave approaches zero. This zero-crossing time serves as a reference to calculate the trigger timing for activating the TRIAC via the MOC3021, ensuring control over dimming operations.
+In summary, the ESP32 received zero-crossing signals from the 4N25 optocoupler, which produced a high-level output as the mains waveform approached zero. This zero-crossing instant was used as a reference to calculate the appropriate trigger delay for activating the TRIAC through the MOC3021, enabling control of the dimming operation.
 
-The complete circuit schematic is shown below.
+The complete circuit schematic used in this project is shown below.
 
 ![Complete circuit schematic]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/complete_circuit_schematic.webp)
-*Figure 2 — Complete circuit schematic.*
+*Figure 1 — Complete circuit schematic.*
 
-## Zero-crossing Detector
+In the following sections, the circuit, along with the embedded firmware and app code, will be explained in more detail.
+
+### Zero-crossing Detector
 
 A zero-crossing detector circuit is essential for identifying when the supply voltage crosses zero. This information is then used to calculate the trigger time for the TRIAC in each cycle of the supply voltage waveform. The image below illustrates the zero-crossing with a sinusoidal wave and the trigger time.
 
 ![Zero-crossing and TRIAC trigger time illustration]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/zero-crossing_and_triac_trigger_time_illustration.webp)
-*Figure 3 — Zero-crossing and TRIAC trigger time illustration.*
+*Figure 2 — Zero-crossing and TRIAC trigger time illustration.*
 
-As the ESP32 only reads positive voltage signals below 5 V, it is necessary to reduce and rectify the input voltage that will be read by the microcontroller. A transformer is used to step down the supply voltage, resulting in a signal that is a reduced copy of the source signal (127 V / 220 V AC) at about 12 V AC. Following this, a full bridge rectifier converts the negative part of the input voltage to positive, producing a signal with a maximum peak of less than 6 V DC. Additionally, a 10k resistor acts as a pull-up resistor in the microcontroller input, ensuring it outputs a high signal when the power grid wave approaches zero. The circuit schematic below illustrates this setup.
+As the ESP32 only reads positive voltage signals below 5 V, it was necessary to reduce and rectify the input voltage read by the microcontroller. A transformer was used to step down the supply voltage, resulting in a signal that was a reduced copy of the source signal (127 V / 220 V AC) at approximately 12 V AC. Following this, a full bridge rectifier converted the negative part of the input voltage to positive, producing a signal with a maximum peak of less than 6 V DC. Additionally, a 10 kΩ resistor acted as a pull-up resistor on the microcontroller input, ensuring that it output a high signal when the power grid waveform approached zero. The circuit schematic below illustrates this setup.
 
 ![Zero-crossing detector circuit schematic]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/zero-crossing_detector_circuit_schematic.webp)
-*Figure 4 — Zero-crossing detector circuit schematic.*
+*Figure 3 — Zero-crossing detector circuit schematic.*
 
-By setting up this circuit, the expected output of the optocoupler, in relation to the rectifier, will look like the waveform illustrated below. The blue wave represents the rectifier output, while the orange wave represents the optocoupler output, which serves as the input to the microcontroller.
+After setting up the circuit, the optocoupler output was observed in relation to the rectifier output, and its behavior matched the waveform illustrated below. The rectifier output was measured as the blue waveform, while the optocoupler output, shown in orange, was used as the input signal to the microcontroller.
 
 ![Rectifier output and 4N25 optocoupler output]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/rectifier_output_and_4n25_optocoupler_output.webp)
-*Figure 5 — Rectifier output (blue) and 4N25 optocoupler output (orange).*
+*Figure 4 — Rectifier output (blue) and 4N25 optocoupler output (orange).*
 
-When the output of the rectifier approaches zero, the optocoupler triggers a small pulse just before the zero-crossing point, at a voltage below 1 V, and stops shortly after when the voltage reaches the same level. This happens because the LED inside the optocoupler stops conducting at this low voltage. It is important to note that this pulse has a significant duration and must be considered when calculating the zero-crossing moment. Therefore, the zero-crossing time can be approximated as occurring at the middle of the pulse triggered by the optocoupler.
+When the rectifier output approached zero, the optocoupler generated a short pulse slightly before the zero-crossing point, at a voltage below 1 V, and stopped shortly after when the voltage reached the same level. This behavior occurred because the LED inside the optocoupler ceased conduction at low voltage levels. It was observed that this pulse had a noticeable duration and needed to be taken into account when determining the zero-crossing instant. As a result, the zero-crossing time was approximated as the midpoint of the pulse produced by the optocoupler.
 
-By connecting the optocoupler output to the ESP32, the signal's logic level can be identified. An algorithm can then calculate the average time between transitions from low to high logic levels and vice versa to estimate the zero-crossing time.
+By connecting the optocoupler output to the ESP32, the signal logic levels were identified by the microcontroller. An algorithm was then implemented to calculate the average time between transitions from low to high logic levels and from high to low, allowing the zero-crossing time to be estimated.
 
-The following code implements an Interrupt Service Routine (ISR) for zero-crossing detection, capturing timestamps on both rising and falling edges of the optocoupler signal. Due to ISR speed constraints, average time calculations between these timestamps are performed in a separate function allocated to a task. Additionally, a timer in the code schedules a function to generate a small pulse on the output pin after the rising edge, to verify the zero-crossing time estimation.
+The following code implemented an Interrupt Service Routine (ISR) for zero-crossing detection, capturing timestamps on both the rising and falling edges of the optocoupler signal. Because of ISR execution time constraints, the calculation of the average time between these timestamps was handled in a separate function running within a task. In addition, a timer was used to schedule a function that generated a short pulse on the output pin after the rising edge, allowing the zero-crossing time estimation to be verified.
 
 ```c
 #include "driver/gpio.h"
@@ -77,7 +80,7 @@ The following code implements an Interrupt Service Routine (ISR) for zero-crossi
 #include "freertos/task.h"
 #include "lwip/err.h"
 
-/* Interruption and GPIO */
+/* Interrupt and GPIO */
 #define ESP_INTR_FLAG_DEFAULT 0
 #define INPUT_PIN GPIO_NUM_27
 #define OUTPUT_PIN GPIO_NUM_33
@@ -166,7 +169,7 @@ static void trigger_timer_callback(void *arg)
  *
  * This function initializes and manages the operation of a smart dimmer 
  * system. It configures timers, GPIO pins, interrupt service routines, 
- * and tasks to controlthe brightness of a lighting system based on 
+ * and tasks to control the brightness of a lighting system based on 
  * zero-crossing detection. The system adjusts the brightness of the lights 
  * according to the detected brightness level and zero-crossing timing.
  *
@@ -204,7 +207,7 @@ void smart_dimmer_control(void *arg)
     ret = gpio_set_direction(OUTPUT_PIN, GPIO_MODE_OUTPUT);
     ESP_ERROR_CHECK(ret);
 
-    /* Infinity loop */
+    /* Infinite loop */
     for (;;) {
         /* Suspend the task until it is resumed externally */
         vTaskSuspend(NULL);
@@ -225,30 +228,32 @@ void app_main(void)
 }
 ```
 
-If everything has gone well, the zero-crossing estimate trigger should match the midpoint of the optocoupler-triggered pulse and closely match the actual zero of the rectifier output, as illustrated in the following figures.
+Once the implementation was completed and tested, the zero-crossing estimate trigger was observed to align with the midpoint of the pulse generated by the optocoupler, as desired, and to closely match the actual zero of the rectifier output, as shown in the following figures.
 
-![Optocoupler output and and ESP32 Trigger output]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_at_the_zero_crossing.webp)
-*Figure 6 — Optocoupler output (blue) and ESP32 Trigger at the zero-crossing (orange).*
+![Optocoupler output and ESP32 Trigger output]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_at_the_zero_crossing.webp)
+*Figure 5 — Optocoupler output (blue) and ESP32 Trigger at the zero-crossing (orange).*
 
 
 ![Rectifier output and ESP32 Trigger at the zero-crossing]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/rectifier_output_and_esp32_trigger_at_the_zero_crossing.webp)
-*Figure 7 — Rectifier output (blue) and ESP32 Trigger at the zero-crossing (orange).*
+*Figure 6 — Rectifier output (blue) and ESP32 Trigger at the zero-crossing (orange).*
 
-## Triggering the TRIAC
+With the zero-crossing detection verified, the next focus shifted to triggering the TRIAC at precise points after each zero-crossing to control the light’s brightness.
 
-The next step is to trigger the TRIAC at a desired time after the input voltage crosses zero. This is essential for dimmer circuits, which use phase control to adjust the amount of power delivered to the load. In phase control, the TRIAC is triggered at a specific point in each AC cycle, effectively cutting part of the waveform. By changing the point at which the TRIAC is triggered, the amount of the AC waveform applied to the load is controlled, thereby regulating the power.
+### Triggering the TRIAC
 
-The trigger time can be represented in terms of brightness. A lower brightness value corresponds to a later TRIAC trigger time, resulting in less current being supplied to the load. Since the frequency of the electrical network corresponds to each complete cycle of a sinusoidal signal, it is important to note that the zero-crossing detector operates twice per period of the supply waveform, effectively doubling the detection frequency. Therefore, the brightness value, which ranges from 0% to 100%, must be accurately converted to the appropriate trigger time to achieve the desired dimming effect. Consequently, the trigger time $$t$$ can be represented considering the brightness $$b$$ and the frequency $$f$$ by the following expression.
+The next step was to trigger the TRIAC at a desired time after the input voltage crossed zero. This step was essential for the dimmer circuit, which relied on phase control to adjust the amount of power delivered to the load. In this approach, the TRIAC was triggered at a specific point within each AC cycle, effectively removing a portion of the waveform. By varying the trigger point, the portion of the AC waveform applied to the load was controlled, thereby regulating the delivered power.
+
+The trigger time was expressed in terms of brightness, where lower brightness values corresponded to later TRIAC trigger times and, consequently, to a reduced current supplied to the load. Since the frequency of the electrical network corresponds to the period of the sinusoidal supply signal, it was also taken into account that the zero-crossing detector operated twice per cycle, effectively doubling the detection frequency. Therefore, the brightness value, defined in the range from 0% to 100%, was converted into the appropriate trigger time to achieve the desired dimming effect. As a result, the trigger time $$t$$ was expressed as a function of the brightness $$b$$ and the frequency $$f$$ using the following relation:
 
 $$
 t(b,f) = \left(1 - \frac{b}{100}\right)\left(\frac{10^6}{2f}\right)
 $$
 
-In this expression, the trigger time $$t$$ is given in microseconds, the brightness value $$b$$ ranges from 0 to 100, and $$f$$ is the frequency of the electrical network in Hz. Given that frequency is the inverse of the period, the equation can also be expressed using the period instead of frequency.
+In this expression, the trigger time $$t$$ was given in microseconds, the brightness value $$b$$ ranged from 0 to 100, and $$f$$ represented the frequency of the electrical network in hertz. Since frequency is the inverse of the period, the equation was also expressed in terms of the signal period instead of frequency.
 
-To implement this expression in the code, the trigger time calculation must be performed after each zero-crossing detection, taking into account the brightness value. First, it is necessary to calculate the period of the electrical network. This can be done in the ISR by subtracting the last recorded rising edge time from the current time, providing an estimated period. The trigger time is then computed in an auxiliary function, as floating point operations are constrained within the ISR. Subsequently, in the ISR, the timer executed after the rising edge is set with the calculated trigger time.
+To implement this expression in the code, the trigger time calculation was performed after each zero-crossing detection, taking the selected brightness value into account. First, the period of the electrical network was estimated by subtracting the previously recorded rising edge timestamp from the current one within the ISR. The trigger time was then calculated in an auxiliary function, since floating-point operations were constrained inside the ISR. Finally, still within the ISR, the timer scheduled after the rising edge was configured using the computed trigger time.
 
-For example, the code incorporating these adjustments can be structured as follows, assuming a brightness setting of 50%.
+The code employing these adjustments was structured as follows, assuming a brightness setting of 50%:
 
 ```c
 #include "driver/gpio.h"
@@ -257,7 +262,7 @@ For example, the code incorporating these adjustments can be structured as follo
 #include "freertos/task.h"
 #include "lwip/err.h"
 
-/* Interruption and GPIO */
+/* Interrupt and GPIO */
 #define ESP_INTR_FLAG_DEFAULT 0
 #define INPUT_PIN GPIO_NUM_27
 #define OUTPUT_PIN GPIO_NUM_33
@@ -353,7 +358,7 @@ static void trigger_timer_callback(void *arg)
  *
  * This function initializes and manages the operation of a smart dimmer 
  * system. It configures timers, GPIO pins, interrupt service routines, 
- * and tasks to controlthe brightness of a lighting system based on 
+ * and tasks to control the brightness of a lighting system based on 
  * zero-crossing detection. The system adjusts the brightness of the lights 
  * according to the detected brightness level and zero-crossing timing.
  *
@@ -391,7 +396,7 @@ void smart_dimmer_control(void *arg)
     ret = gpio_set_direction(OUTPUT_PIN, GPIO_MODE_OUTPUT);
     ESP_ERROR_CHECK(ret);
 
-    /* Infinity loop */
+    /* Infinite loop */
     for (;;) {
         /* Suspend the task until it is resumed externally */
         vTaskSuspend(NULL);
@@ -417,14 +422,14 @@ void app_main(void)
 }
 ```
 
-If everything is executed successfully, upon compiling and deploying the code on the microcontroller, the pulse triggered by the ESP32 should align with the peak of the rectifier waveform, thereby synchronizing with the waveform of the power supply, as shown in the image below.
+Once the code was successfully compiled and deployed on the microcontroller, the pulse generated by the ESP32 was observed to align with the peak of the rectifier waveform, thereby remaining synchronized with the power supply waveform, as shown in the image below.
 
 ![Rectifier output and ESP32 trigger at the half of the brightness]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/rectifier_output_and_esp32_trigger_at_half_brightness.webp)
-*Figure 8 — Rectifier output (blue) and ESP32 trigger at the half of the brightness (orange).*
+*Figure 7 — Rectifier output (blue) and ESP32 trigger at the half of the brightness (orange).*
 
-However, a small adjustment to the previous code is needed to ensure proper operation: extending the TRIAC triggering beyond the calculated time until the next zero-crossing detection. This prevents issues related to high brightness levels and timing errors in zero-crossing estimation.
+However, a small adjustment was made to the previous code to ensure proper operation by extending the TRIAC triggering beyond the calculated trigger time until the next zero-crossing detection. This modification prevented issues related to high brightness levels and potential timing errors in the zero-crossing estimation.
 
-For example, if the brightness is set to near 100% and the zero-crossing is miscalculated to occur earlier than it actually does, the TRIAC might be triggered too soon. This could result in inadequate current supply to the light, as the TRIAC would stop conducting immediately after the real zero-crossing. By maintaining the TRIAC in the triggered state until the next rising edge of the zero-crossing detector, we ensure it remains closed to supply the necessary current for the desired brightness, overcoming any timing inconsistencies. Below is the code incorporating these adjustments.
+For example, when the brightness was set close to 100% and the zero-crossing was estimated to occur earlier than it actually did, the TRIAC could be triggered prematurely. This situation could lead to an insufficient current being supplied to the load, since the TRIAC would stop conducting immediately after the actual zero-crossing. By keeping the TRIAC in the triggered state until the next rising edge of the zero-crossing detector, it was ensured that it remained conducting long enough to supply the required current for the selected brightness, effectively compensating for timing inaccuracies. The code implementing these adjustments is shown below:
 
 ```c
 #include "driver/gpio.h"
@@ -433,7 +438,7 @@ For example, if the brightness is set to near 100% and the zero-crossing is misc
 #include "freertos/task.h"
 #include "lwip/err.h"
 
-/* Interruption and GPIO */
+/* Interrupt and GPIO */
 #define ESP_INTR_FLAG_DEFAULT 0
 #define INPUT_PIN GPIO_NUM_27
 #define OUTPUT_PIN GPIO_NUM_33
@@ -478,7 +483,7 @@ void IRAM_ATTR crossing_zero_isr_handler(void *arg)
 
     /* Rising edge detected */
     if (current_state && !is_crossing_zero) {
-        /* Turnoff the active trigger */
+        /* Turn off the active trigger */
         ret = gpio_set_level(OUTPUT_PIN, 0);
         ESP_ERROR_CHECK(ret);
 
@@ -531,7 +536,7 @@ static void trigger_timer_callback(void *arg)
  *
  * This function initializes and manages the operation of a smart dimmer 
  * system. It configures timers, GPIO pins, interrupt service routines, 
- * and tasks to controlthe brightness of a lighting system based on 
+ * and tasks to control the brightness of a lighting system based on 
  * zero-crossing detection. The system adjusts the brightness of the lights 
  * according to the detected brightness level and zero-crossing timing.
  *
@@ -569,7 +574,7 @@ void smart_dimmer_control(void *arg)
     ret = gpio_set_direction(OUTPUT_PIN, GPIO_MODE_OUTPUT);
     ESP_ERROR_CHECK(ret);
 
-    /* Infinity loop */
+    /* Infinite loop */
     for (;;) {
         /* Suspend the task until it is resumed externally */
         vTaskSuspend(NULL);
@@ -595,41 +600,43 @@ void app_main(void)
 }
 ```
 
-The next waveform illustrates the result of these adjustments in the triggering code. Notice that the trigger starts at 50% of the rectifier waveform, but only ends at the rising edge of the optocoupler zero-crossing detection. This ensures that the TRIAC remains conducting, thereby supplying adequate current to the load for the entire duration of the intended brightness period.
+The following waveform illustrated the result of these adjustments in the triggering code. It was observed that the trigger started at 50% of the rectifier waveform but only ended at the rising edge of the optocoupler zero-crossing detection. This behavior ensured that the TRIAC remained conducting and supplied adequate current to the load for the entire duration corresponding to the intended brightness level.
 
-![Optocoupler output and and ESP32 Trigger output adjusted]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_adjusted.webp)
-*Figure 9 — Optocoupler output (blue) and ESP32 Trigger adjusted (orange).*
+![Optocoupler output and ESP32 Trigger output adjusted]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_adjusted.webp)
+*Figure 8 — Optocoupler output (blue) and ESP32 Trigger adjusted (orange).*
 
-In the following image, with the brightness value set to 100%, the trigger initiates right at the zero-crossing and continues until the rising edge of the optocoupler zero-crossing detection. 
+In the following image, with the brightness value set to 100%, the trigger was observed to initiate precisely at the zero-crossing and to continue until the rising edge of the optocoupler zero-crossing detection.
 
-![Optocoupler output and and ESP32 Trigger output adjusted at 100% brightness]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_adjusted_100.webp)
-*Figure 10 — Optocoupler output (blue) and ESP32 Trigger adjusted at 100% brightness (orange).*
+![Optocoupler output and ESP32 Trigger output adjusted at 100% brightness]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/optocoupler_output_and_esp32_trigger_adjusted_100.webp)
+*Figure 9 — Optocoupler output (blue) and ESP32 Trigger adjusted at 100% brightness (orange).*
 
-At this point, we can accurately control when to trigger the TRIAC to adjust the light's brightness as desired. To achieve this, it is essential to isolate the microcontroller using an optocoupler, which will effectively trigger the TRIAC, as illustrated in the following circuit.
+At this stage, it was possible to accurately control the TRIAC triggering instant to adjust the light brightness as required. To achieve this, the microcontroller was electrically isolated using an optocoupler, which was used to drive and trigger the TRIAC, as illustrated in the following circuit:
 
 ![TRIAC trigger circuit schematic]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/triac_trigger_circuit_schematic.webp)
-*Figure 11 — TRIAC trigger circuit schematic.*
+*Figure 10 — TRIAC trigger circuit schematic.*
 
-Therefore, assuming the brightness value is 50%, connecting the complete circuit with the lamp as a load should result in the following waveform on the TRIAC.
+Therefore, when the brightness value was set to 50% and the complete circuit was connected with the light bulb as the load, the resulting waveform observed at the TRIAC was as illustrated below:
 
 ![Power supply and TRIAC output with brightness value at 50%]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/power_supply_and_triac_output_with_brightness_at_50.webp)
-*Figure 12 — Power supply (blue) and TRIAC output (orange) with brightness value at 50%.*
+*Figure 11 — Power supply (blue) and TRIAC output (orange) with brightness value at 50%.*
 
-It is expected that the brightness of the light will be reduced, compared to its conventional operation. If the brightness parameter is set to 25%, the light brightness will decrease even more and the TRIAC output will have the following waveform.
+It was observed that the light brightness was reduced compared to its conventional operation. When the brightness parameter was set to 25%, the light intensity decreased further, and the TRIAC output exhibited the corresponding waveform shown next:
 
 ![Power supply and TRIAC output with brightness value at 25%]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/power_supply_and_triac_output_with_brightness_at_25.webp)
-*Figure 13 — Power supply (blue) and TRIAC output (orange) with brightness value at 25%.*
+*Figure 12 — Power supply (blue) and TRIAC output (orange) with brightness value at 25%.*
 
-If the brightness is set to 75%, the light brightness will increase and the waveform will be similar to the next one.
+When the brightness was set to 75%, the light intensity increased, and the resulting waveform is shown below:
 
 ![Power supply and TRIAC output with brightness value at 75%]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/power_supply_and_triac_output_with_brightness_at_75.webp)
-*Figure 14 — Power supply (blue) and TRIAC output (orange) with brightness value at 75%.*
+*Figure 13 — Power supply (blue) and TRIAC output (orange) with brightness value at 75%.*
 
-The ESP32 code currently sets the brightness level of the light effectively. However, due to its current design, adjusting the brightness requires recompiling and uploading the code to the microcontroller each time. Therefore, the next phase of this project involves modifying the code to enable real-time brightness adjustments via network connectivity, eliminating the need for recompilation.
+The ESP32 firmware successfully controlled the light brightness. However, in this implementation, changing the brightness level required recompiling and reuploading the code to the microcontroller. As a result, the next phase of the project focused on modifying the implementation to allow real-time brightness adjustments through network connectivity, removing the need for recompilation.
 
 ## Wifi Access Point and Web Server
 
-The ESP32 must control the TRIAC via the network to enable dynamic adjustment. Therefore, configuring the ESP32 to connect to Wi-Fi and set up a web server to receive the desired brightness value is necessary. To achieve this, a Wi-Fi access point can be established for users to connect and communicate with the ESP32 web server. Additionally, an IP address can be fixed for the ESP32, making it easier to communicate with the web server. The following code demonstrates how to set up an access point with a fixed IP address on the ESP32.
+To enable dynamic brightness adjustment, the ESP32 was configured to control the TRIAC over a network connection. This required setting up the ESP32 to connect via Wi-Fi and host a web server capable of receiving the desired brightness value. To accomplish this, a Wi-Fi access point was established, allowing users to connect directly to the ESP32 and communicate with its web server. In addition, a fixed IP address was assigned to the ESP32 to simplify access to the server. 
+
+The following code shows how the access point and fixed IP configuration were implemented on the ESP32:
 
 ```c
 #include <netdb.h>
@@ -741,9 +748,9 @@ void app_main(void)
 }
 ```
 
-If the code has executed successfully on the ESP32, a new access point should appear among nearby Wi-Fi networks. The microcontroller’s IP address will remain fixed. If everything has worked correctly up to this point, the microcontroller is now available for communication, allowing us to set up a web server to receive data.
+Once the code was successfully executed on the ESP32, a new access point appeared among the available Wi-Fi networks, with the microcontroller assigned a fixed IP address. After confirming that this step worked as expected, the microcontroller was available for communication, allowing the web server to be set up to receive data.
 
-To achieve this, one function initializes the web server and another handles requests, as shown in the following code snippet. The *http_server_init* function starts the server with default settings and registers a handler for HTTP GET requests at the root endpoint (‘/’). The *http_request_handler* function processes incoming requests by extracting the "brightness" parameter from the URL query string, converting it to an integer within the range of 0 to 100. It then formats the current brightness value into a response buffer and sends it back to the client as the HTTP response.
+To achieve this, one function was used to initialize the web server and another to handle incoming requests, as shown in the following code snippet. The **http_server_init** function started the server using default settings and registered a handler for HTTP GET requests at the root endpoint (**'/'**). The **http_request_handler** function processed incoming requests by extracting the brightness parameter from the URL query string and converting it into an integer within the range of 0 to 100. The current brightness value was then formatted into a response buffer and sent back to the client as the HTTP response. This is shown in the next code section:
 
 ```c
 #include <netdb.h>
@@ -950,9 +957,9 @@ void app_main(void)
 }
 ```
 
-By merging the TRIAC trigger code with the Wi-Fi access point and web server code, we can effectively change the brightness of the light over the network by sending brightness parameters to the web server. The server decodes these parameters and adjusts the brightness accordingly. To ensure smooth operation, we must utilize the ESP32's dual cores by running the TRIAC control function on a different core than the web server. This separation prevents one function from blocking the other, which is crucial for the precise execution of the TRIAC trigger code. Without this separation, any delay in the web server could interfere with the TRIAC triggering process and affect the desired output.
+By merging the TRIAC triggering logic with the Wi-Fi access point and web server implementation, the light brightness was effectively adjusted over the network by sending brightness parameters to the web server. These parameters were decoded by the server and used to update the brightness accordingly. To ensure reliable operation, the ESP32’s dual-core architecture was utilized by running the TRIAC control task on a different core from the web server. This separation prevented one function from blocking the other, which was essential for maintaining precise TRIAC triggering. Without this approach, delays introduced by the web server could have interfered with the TRIAC control timing and affected the resulting output.
 
-To achieve this, the RTOS function *xTaskCreatePinnedToCore* can be used. This method allocates the TRIAC dimmer control function to a parallel core, while the web server handler function runs on the main core, as demonstrated in the following complete code.
+To achieve this, the RTOS function **xTaskCreatePinnedToCore** was used to assign the TRIAC dimmer control task to a secondary core, while the web server handler continued to run on the main core, as demonstrated in the following complete code:
 
 ```c
 #include <netdb.h>
@@ -977,7 +984,7 @@ To achieve this, the RTOS function *xTaskCreatePinnedToCore* can be used. This m
 #define GATEWAY_ADDR "192.168.1.1"
 #define NETMASK_ADDR "255.255.255.0"
 
-/* Interruption and GPIO */
+/* Interrupt and GPIO */
 #define ESP_INTR_FLAG_DEFAULT 0
 #define INPUT_PIN GPIO_NUM_27
 #define OUTPUT_PIN GPIO_NUM_33
@@ -1022,7 +1029,7 @@ void IRAM_ATTR crossing_zero_isr_handler(void *arg)
 
     /* Rising edge detected */
     if (current_state && !is_crossing_zero) {
-        /* Turnoff the active trigger */
+        /* Turn off the active trigger */
         ret = gpio_set_level(OUTPUT_PIN, 0);
         ESP_ERROR_CHECK(ret);
 
@@ -1075,7 +1082,7 @@ static void trigger_timer_callback(void *arg)
  *
  * This function initializes and manages the operation of a smart dimmer 
  * system. It configures timers, GPIO pins, interrupt service routines, 
- * and tasks to controlthe brightness of a lighting system based on 
+ * and tasks to control the brightness of a lighting system based on 
  * zero-crossing detection. The system adjusts the brightness of the lights 
  * according to the detected brightness level and zero-crossing timing.
  *
@@ -1113,7 +1120,7 @@ void smart_dimmer_control(void *arg)
     ret = gpio_set_direction(OUTPUT_PIN, GPIO_MODE_OUTPUT);
     ESP_ERROR_CHECK(ret);
 
-    /* Infinity loop */
+    /* Infinite loop */
     for (;;) {
         /* Suspend the task until it is resumed externally */
         vTaskSuspend(NULL);
@@ -1317,11 +1324,13 @@ void app_main(void)
 }
 ```
 
-After deploying the code on the ESP32, we can test it by connecting to the access point and entering the ESP32's IP address in a web browser. The web server will display the current brightness value (initially zero). To change the brightness, include the desired value as a query string parameter in the URL. The web server will then respond with the new brightness value, and the light will adjust accordingly. Consequently, the next step of this project is to develop a mobile app capable of sending requests with the brightness parameters to the ESP32 web server, enhancing the usability of the smart dimmer.
+After deploying the code on the ESP32, the system was tested by connecting to the access point and entering the ESP32’s IP address in a web browser. The web server initially displayed the current brightness value, which was set to zero. To change the brightness, the desired value was included as a query string parameter in the URL. The web server responded with the updated brightness value, and the light adjusted accordingly. As a result, the next step of the project focused on developing a mobile application capable of sending brightness control requests to the ESP32 web server, improving the overall usability of the smart dimmer.
 
-## Mobile App
+### Mobile App
 
-Currently, the dimmer circuit and the ESP32 program are functioning well. However, the user interface is still quite basic, requiring manual input of brightness parameters in the URL to make changes. To enhance user experience, developing a mobile app would provide a much more user-friendly way to operate the smart dimmer. A simple Android app with a seek bar interface would allow users to easily adjust the brightness. The code for the user interface, including this seek bar, can be seen below.
+At this stage, both the dimmer circuit and the ESP32 firmware were operating correctly. However, the user interface remained fairly basic, as brightness adjustments required manually entering parameters in the URL. To improve usability, the development of a mobile application was identified as a more user-friendly solution for controlling the smart dimmer. A simple Android application featuring a seek bar interface was implemented to allow intuitive brightness adjustment. 
+
+The following code defines the user interface for the Android app. It consists of a **SeekBar** for adjusting the brightness and a **TextView** that displays the current brightness value:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1359,7 +1368,9 @@ Currently, the dimmer circuit and the ESP32 program are functioning well. Howeve
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-In the app code, you'll need to design the user interface and implement the functionality for sending requests to the ESP32 web server. To simplify the interactions with the server, we can utilize the Volley library, as demonstrated in the following code. When the seek bar is adjusted and released, it triggers the *onStopTrackingTouch* event. This event sends an HTTP request to the ESP32’s IP address with the updated brightness parameters, similar to the process used in the web browser. To ensure this functionality works, we must add internet access permissions to the app settings and integrate the Volley library for communication.
+In the app code, the user interface was designed and the functionality for sending requests to the ESP32 web server was implemented. To simplify server communication, the Volley library was used, as shown in the following code. 
+
+Adjusting and releasing the seek bar triggered the **onStopTrackingTouch** event, which sent an HTTP request to the ESP32’s IP address with the updated brightness value, following the same process used in the web browser. To enable this functionality, internet access permissions were added to the app settings, and the Volley library was integrated to handle the network communication.
 
 ```java
 package com.example.dimmer;
@@ -1439,29 +1450,40 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-To add the internet connection permission, just insert the following line of code in the *AndroidManifest.xml* file.
+To enable internet access, the following code was added to the **AndroidManifest.xml** file:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-To add the library, it is necessary to insert the following line in the *build.gradle* file dependencies.
+To include the Volley library, the following line was added to the dependencies section of the **build.gradle** file:
 
 ```
 implementation 'com.android.volley:volley:1.2.1'
 ```
 
-In conclusion, once everything is properly configured, the final step is to compile and install the app on an Android smartphone. After installation, we can connect to the ESP32 access point and adjust the light’s brightness using the seek bar. This seamless integration of hardware and software not only enhances the user experience but also demonstrates the potential of IoT technology in creating smart, user-friendly solutions.
+Once all configurations were completed, the final step involved compiling and installing the app on an Android smartphone. After installation, the device was connected to the ESP32 access point, allowing the light brightness to be adjusted directly using the seek bar.
+
+## Results
+
+The project was successfully completed, and the system operated as intended. The mobile app was able to set the light brightness by sending HTTP requests containing the desired brightness value to the ESP32 microcontroller. Upon receiving these requests, the ESP32 adjusted the TRIAC triggering accordingly, allowing real-time control of the light intensity through the app.
+
+![Smart dimmer controlled by mobile app]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/smart_dimmer_controlled_by_mobile_app.webp)
+*Figure 14 — Smart dimmer controlled by mobile app.*
+
+Beyond its current implementation, it provides a foundation for developing a smart dimmer product. Future work could focus on designing a dedicated PCB and a case to improve durability, safety, and aesthetics, while further evaluating the system to optimize user experience.
 
 ![Smart dimmer controlled by mobile app]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/complete prototype_working_on_the_breadboard.gif)
 *Figure 15 — Complete prototype working on the breadboard.*
 
-## Final Considerations
+The current implementation uses the seek bar’s **onStopTrackingTouch** event to send the brightness value to the microcontroller. However, this event is not ideal, as it causes abrupt changes in brightness. A different event could be used to provide smoother transitions and a better user experience when adjusting the light intensity.
 
-Here are some final considerations for the development of this project:
+## Conclusion
 
-1. **Compatibility**: The project is designed for conventional incandescent lights and will not work well with LED lights due to differences in their operation.
-2. **Access**: The web server is accessible only to devices connected to the ESP32 access point. Be aware that devices will disconnect from other networks when connecting to the ESP32's access point to send commands to the dimmer.
-3. **HTTP Method**: The web server uses HTTP GET requests for simplicity in receiving brightness parameters. For integration into larger systems like a smart home, consider using HTTP POST requests. Additionally, if the web server is exposed to the internet, implement authentication and encryption to ensure security.
+The proof of concept for this smart dimmer system was successfully completed, and the system operates reliably, allowing real-time brightness control via the mobile app and ESP32 microcontroller. 
 
-The complete source code used in this project is available on [GitHub](https://github.com/workabotic/smart_dimmer_controlled_by_mobile_app).
+Some final considerations for this project relate to compatibility, access, and communication methods. The system was specifically designed for conventional incandescent lights and may not perform optimally with LEDs or other non-resistive loads, due to differences in their electrical behavior.
+
+Regarding network access, the web server is available only to devices connected directly to the ESP32 access point. Devices connecting to this access point will be temporarily disconnected from other networks while sending commands to the dimmer, which may affect convenience in certain use cases.
+
+Finally, the web server currently uses HTTP GET requests to receive brightness parameters for simplicity. For integration into larger systems, such as smart home setups, using HTTP POST requests is recommended. Additionally, if the server is exposed to the internet, implementing authentication and encryption is essential to maintain security and prevent unauthorized access.
