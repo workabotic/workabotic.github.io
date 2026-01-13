@@ -8,7 +8,7 @@ kramdown:
     block:
       line_numbers: true
 
-paginate: 5
+paginate: 10
 baseurl:
 domain_name: 'http://workabotic.com'
 url: 'https://workabotic.github.io'
@@ -22,11 +22,11 @@ plugins:
     - jekyll-sitemap
 
 authors:
-    lucasmazz:
+    lucasmazzetto:
         name: Lucas Mazzetto
         ocupation: Electrical Engineer
         about: Technology enthusiast. Passionate about science, computers, machines, and robots.
-        avatar: lucasmazz
+        avatar: lucasmazzetto
         x: lucasmazz
         github: lucasmazzetto
         linkedin: lucasmazzetto

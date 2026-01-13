@@ -2,7 +2,7 @@
 title: "Smart Dimmer Controlled by Mobile App"
 date: 2024-08-01 18:00:00
 description: A smart dimmer system built using an ESP32 microcontroller, controlled via a mobile app to adjust the brightness of an incandescent light bulb.
-author: lucasmazz
+author: lucasmazzetto
 keywords: android, microcontroller, embedded, IoT, espressif, ESP32, esp32, esp-idf, RTOS, FreeRTOS, dimmer, TRIAC, mobile app, automation, smart home, dimmer circuit, home automation, Wi-Fi dimmer, electronics, embedded systems, electrical engineering, DIY.
 ---
 

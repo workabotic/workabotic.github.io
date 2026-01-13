@@ -2,7 +2,7 @@
 title: "Autonomous Driving Vehicle Simulation"
 date: 2026-01-07 19:00:00
 description: A self-driving vehicle simulation in Gazebo and ROS 2, using a neural network to predict steering angles and velocity only from front camera images.
-author: lucasmazz
+author: lucasmazzetto
 keywords: robot, simulation, gazebo, ros, neural network, convolutional neural network, deep learning, robotic simulation, autonomous robots, Gazebo simulation, ROS 2, ROS robot simulation, neural network training, AI in robotics, CNN, deep neural networks, machine learning models, robotics AI, reinforcement learning for robots, computer vision in robotics, self-driving car simulation, neural network-based control, autonomous vehicle technology, robotics and AI integration, simulation environments for robots, real-time robotics simulation, robotic perception
 ---
 

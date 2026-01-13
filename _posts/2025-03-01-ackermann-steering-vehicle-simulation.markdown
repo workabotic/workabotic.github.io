@@ -2,7 +2,7 @@
 title: "Ackermann Steering Vehicle Simulation"
 date: 2025-04-20 10:00:00
 description: Modeling and simulation of a vehicle with Ackermann steering geometry using the Gazebo Simulator and the ROS 2 framework for robotics applications.
-author: lucasmazz
+author: lucasmazzetto
 keywords: robot, simulation, gazebo, ros, robotic simulation, autonomous robots, Gazebo simulation, ROS 2, ROS robot simulation, computer vision in robotics, self-driving car simulation, autonomous vehicle technology, simulation environments for robots, real-time robotics simulation, robotic perception
 ---
 
