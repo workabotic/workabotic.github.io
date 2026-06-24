@@ -1,9 +1,9 @@
 ---
-title: "Embedded Digit Recognition Pipeline"
+title: "Integer-Only Neural Network Inference"
 date: 2026-03-01 10:00:00
-description: Training, quantizing, and embedding a Convolutional Neural Network in a STM32 microcontroller for real-time digit recognition.
+description: Quantizing a Convolutional Neural Network for digit recognition and implementing integer-only inference with fixed-point arithmetic.
 author: lucasmazzetto
-keywords: computer vision, neural network, convolutional neural network, deep learning, quantization, microcontroller, embedded, arm, STM32, stm32, embedded systems, electrical engineering.
+keywords: integer-only inference, quantized neural network, int8 quantization, fixed-point arithmetic, convolutional neural network, CNN, digit recognition, post-training quantization, calibration, embedded machine learning, computer vision
 ---
 
 ## Introduction 
@@ -16,7 +16,7 @@ Even though microcontrollers and neural networks may seem far apart, we can brin
 
 This article presents a simple proof of concept. A Convolutional Neural Network (CNN) was trained for digit recognition, quantized from `float32` to `int8`, exported with quantized weights and scale constants, and executed on an STM32 microcontroller using a fixed-point inference pipeline.
 
-The entire source code for this project is available on [GitHub](https://github.com/workabotic/stm32_digit_recognition). You can explore it, reuse it in your own projects, and contribute if you want.
+The entire source code for this project is available on [GitHub](https://github.com/workabotic/quantized_digit_recognition). You can explore it, reuse it in your own projects, and contribute if you want.
 
 ### Quantization
 
@@ -119,15 +119,15 @@ The choice of granularity involves a trade-off between numerical accuracy and co
 In per-tensor quantization, a single scale parameter is used for all elements of a tensor. If $$x$$ is the input activation tensor, the quantized representation is therefore computed element-wise as:
 
 $$
-\hat{x} = \operatorname{round}(x \cdot s)
+\hat{x} = \operatorname{clip}\left(\operatorname{round}(x \cdot s),\; -Q,\; Q\right)
 $$
 
-where $$s$$ is shared by every element of the tensor. This approach is simple and efficient because the same scale factor can be applied to all values.
+where $$s$$ is shared by every element of the tensor. The clipping step is important because rounding alone may produce values outside the target signed integer range. This approach is simple and efficient because the same scale factor can be applied to all values.
 
 However, tensors such as weight matrices often exhibit different numerical ranges across their rows or channels. To better preserve these variations, a finer granularity can be used. In per-output-feature quantization, each output column of the weight matrix has its own scale factor:
 
 $$
-\hat{w}_{k,m} = \operatorname{round}(w_{k,m} \cdot s_{m})
+\hat{w}_{k,m} = \operatorname{clip}\left(\operatorname{round}(w_{k,m} \cdot s_m),\; -Q,\; Q\right)
 $$
 
 where $$s_m$$ is the scale factor associated with output feature $$m$$, shared by all elements of column $$m$$ of the weight matrix.
@@ -137,7 +137,7 @@ In convolutional layers, a similar strategy is used but the granularity is typic
 If $$w_{c,k,i,j}$$ denotes the weight of a convolution kernel for output channel $$c$$, input channel $$k$$, and spatial coordinates $$(i,j)$$, the quantized representation is computed element-wise as:
 
 $$
-\hat{w}_{c,k,i,j} = \operatorname{round}(w_{c,k,i,j} \cdot s_c)
+\hat{w}_{c,k,i,j} = \operatorname{clip}\left(\operatorname{round}(w_{c,k,i,j} \cdot s_c),\; -Q,\; Q\right)
 $$
 
 where $$s_c$$ is the scale factor associated with output channel $$c$$, shared by all elements of the filter corresponding to that channel.
@@ -180,12 +180,12 @@ Using this estimated distribution, the calibration step determines a suitable ra
 
 #### KL-divergence calibration
 
-An even more refined method selects the clipping threshold by minimizing the Kullback–Leibler (KL) divergence between the original activation distribution and a simulated quantized distribution. Let $$p(x)$$ be the normalized histogram of the activation magnitudes. For each candidate threshold $$T$$, values above the threshold are folded into the last histogram bin, producing a truncated distribution. This distribution is then quantized into $$N$$ bins (typically $$N=128$$ for `int8`) and reconstructed back to the original resolution, producing an approximate distribution $$q(x)$$.
+An even more refined method selects the clipping threshold by minimizing the Kullback–Leibler (KL) divergence between the original activation distribution and a simulated quantized distribution. Let $$p(x)$$ be the normalized histogram of the activation magnitudes. For each candidate threshold $$T$$, values above the threshold are folded into the last histogram bin, producing the clipped distribution $$p_T$$. This distribution is then quantized into $$N$$ bins (typically $$N=128$$ for `int8`) and reconstructed back to the original resolution, producing the quantized-and-reconstructed approximation $$q_T$$.
 
 The optimal threshold is chosen as:
 
 $$
-\alpha = \arg\min_T D_{\mathrm{KL}}(p \parallel q)
+\alpha = \arg\min_T D_{\mathrm{KL}}(p_T \parallel q_T)
 $$
 
 Where:
@@ -281,10 +281,14 @@ Next, the weights are quantized offline using per-output-feature granularity,
 where each output feature $$m$$ has its own scale factor:
 
 $$
-\hat{w}_{k,m} = \operatorname{round}(w_{k,m} \cdot s_m)
+\hat{w}_{k,m} =
+\operatorname{clip}\left(
+\operatorname{round}(w_{k,m} \cdot s_m),
+\; -127,\; 127
+\right)
 $$
 
-Where $$w_{k,m}$$ denotes the floating-point weight connecting input feature $$k$$ to output feature $$m$$, and $$\hat{w}_{k,m}$$ is its quantized integer representation. The factor $$s_m$$ is the scale associated with output feature $$m$$ and is shared by all weights contributing to that output. 
+Where $$w_{k,m}$$ denotes the floating-point weight connecting input feature $$k$$ to output feature $$m$$, and $$\hat{w}_{k,m}$$ is its quantized integer representation. The factor $$s_m$$ is the scale associated with output feature $$m$$ and is shared by all weights contributing to that output. Since the implementation uses signed `int8` symmetric quantization, the rounded weights are clipped to the interval $$[-127, 127]$$.
 
 The matrix multiplication can then be performed entirely with integer values:
 
@@ -348,13 +352,16 @@ Next, the convolution weights are quantized offline using per-channel granularit
 $$
 \hat{w}_{c,c_i,k_h,k_w}
 =
+\operatorname{clip}\left(
 \operatorname{round}
 \left(
 w_{c,c_i,k_h,k_w} \cdot s_c
+\right),
+\; -127,\; 127
 \right)
 $$
 
-Where $$w_{c,c_i,k_h,k_w}$$ denotes the floating-point convolution weight and $$\hat{w}_{c,c_i,k_h,k_w}$$ is its quantized integer representation. The factor $$s_c$$ is the scale associated with output channel $$c$$ and is shared by all weights belonging to the same convolution filter.
+Where $$w_{c,c_i,k_h,k_w}$$ denotes the floating-point convolution weight and $$\hat{w}_{c,c_i,k_h,k_w}$$ is its quantized integer representation. The factor $$s_c$$ is the scale associated with output channel $$c$$ and is shared by all weights belonging to the same convolution filter. As in the linear layers, the paper uses signed `int8` symmetric quantization, so the implementation clips the rounded weights to $$[-127, 127]$$.
 
 The convolution can then be computed entirely using integer arithmetic:
 
@@ -417,4 +424,3 @@ y^{(Q16)} = \max\left(0,\; x^{(Q16)}\right)
 $$
 
 Where $$x^{(Q16)}$$ denotes the input activation stored in Q16 format and $$y^{(Q16)}$$ is the resulting output activation. Since the operation only requires a comparison with zero, it can be implemented efficiently using integer arithmetic while preserving the Q16 representation.
-
