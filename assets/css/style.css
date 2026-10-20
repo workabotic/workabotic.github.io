@@ -699,6 +699,13 @@ nav.main-nav a.cta {
   font-size: 18px;
 }
 
+.post table + p > em {
+  display: block;
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+}
+
 .profile-card:first-child {
   border-top: 1px solid #c2c6cc;
 }

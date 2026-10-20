@@ -750,7 +750,7 @@ void app_main(void)
 
 Once the code was successfully executed on the ESP32, a new access point appeared among the available Wi-Fi networks, with the microcontroller assigned a fixed IP address. After confirming that this step worked as expected, the microcontroller was available for communication, allowing the web server to be set up to receive data.
 
-To achieve this, one function was used to initialize the web server and another to handle incoming requests, as shown in the following code snippet. The **http_server_init** function started the server using default settings and registered a handler for HTTP GET requests at the root endpoint (**'/'**). The **http_request_handler** function processed incoming requests by extracting the brightness parameter from the URL query string and converting it into an integer within the range of 0 to 100. The current brightness value was then formatted into a response buffer and sent back to the client as the HTTP response. This is shown in the next code section:
+To achieve this, one function was used to initialize the web server and another to handle incoming requests, as shown in the following code snippet. The `http_server_init` function started the server using default settings and registered a handler for HTTP GET requests at the root endpoint (`'/'`). The `http_request_handler` function processed incoming requests by extracting the brightness parameter from the URL query string and converting it into an integer within the range of 0 to 100. The current brightness value was then formatted into a response buffer and sent back to the client as the HTTP response. This is shown in the next code section:
 
 ```c
 #include <netdb.h>
@@ -959,7 +959,7 @@ void app_main(void)
 
 By merging the TRIAC triggering logic with the Wi-Fi access point and web server implementation, the light brightness was effectively adjusted over the network by sending brightness parameters to the web server. These parameters were decoded by the server and used to update the brightness accordingly. To ensure reliable operation, the ESP32’s dual-core architecture was utilized by running the TRIAC control task on a different core from the web server. This separation prevented one function from blocking the other, which was essential for maintaining precise TRIAC triggering. Without this approach, delays introduced by the web server could have interfered with the TRIAC control timing and affected the resulting output.
 
-To achieve this, the RTOS function **xTaskCreatePinnedToCore** was used to assign the TRIAC dimmer control task to a secondary core, while the web server handler continued to run on the main core, as demonstrated in the following complete code:
+To achieve this, the RTOS function `xTaskCreatePinnedToCore` was used to assign the TRIAC dimmer control task to a secondary core, while the web server handler continued to run on the main core, as demonstrated in the following complete code:
 
 ```c
 #include <netdb.h>
@@ -1330,7 +1330,7 @@ After deploying the code on the ESP32, the system was tested by connecting to th
 
 At this stage, both the dimmer circuit and the ESP32 firmware were operating correctly. However, the user interface remained fairly basic, as brightness adjustments required manually entering parameters in the URL. To improve usability, the development of a mobile application was identified as a more user-friendly solution for controlling the smart dimmer. A simple Android application featuring a seek bar interface was implemented to allow intuitive brightness adjustment. 
 
-The following code defines the user interface for the Android app. It consists of a **SeekBar** for adjusting the brightness and a **TextView** that displays the current brightness value:
+The following code defines the user interface for the Android app. It consists of a `SeekBar` for adjusting the brightness and a `TextView` that displays the current brightness value:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1370,7 +1370,7 @@ The following code defines the user interface for the Android app. It consists o
 
 In the app code, the user interface was designed and the functionality for sending requests to the ESP32 web server was implemented. To simplify server communication, the Volley library was used, as shown in the following code. 
 
-Adjusting and releasing the seek bar triggered the **onStopTrackingTouch** event, which sent an HTTP request to the ESP32’s IP address with the updated brightness value, following the same process used in the web browser. To enable this functionality, internet access permissions were added to the app settings, and the Volley library was integrated to handle the network communication.
+Adjusting and releasing the seek bar triggered the `onStopTrackingTouch` event, which sent an HTTP request to the ESP32’s IP address with the updated brightness value, following the same process used in the web browser. To enable this functionality, internet access permissions were added to the app settings, and the Volley library was integrated to handle the network communication.
 
 ```java
 package com.example.dimmer;
@@ -1450,13 +1450,13 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-To enable internet access, the following code was added to the **AndroidManifest.xml** file:
+To enable internet access, the following code was added to the `AndroidManifest.xml` file:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-To include the Volley library, the following line was added to the dependencies section of the **build.gradle** file:
+To include the Volley library, the following line was added to the dependencies section of the `build.gradle` file:
 
 ```
 implementation 'com.android.volley:volley:1.2.1'
@@ -1476,7 +1476,7 @@ Beyond its current implementation, it provides a foundation for developing a sma
 ![Smart dimmer controlled by mobile app]({{ site.url }}{{ site.baseurl }}/public/images/smart-dimmer-controlled-by-mobile-app/complete prototype_working_on_the_breadboard.gif)
 *Figure 15 — Complete prototype working on the breadboard.*
 
-The current implementation uses the seek bar’s **onStopTrackingTouch** event to send the brightness value to the microcontroller. However, this event is not ideal, as it causes abrupt changes in brightness. A different event could be used to provide smoother transitions and a better user experience when adjusting the light intensity.
+The current implementation uses the seek bar’s `onStopTrackingTouch` event to send the brightness value to the microcontroller. However, this event is not ideal, as it causes abrupt changes in brightness. A different event could be used to provide smoother transitions and a better user experience when adjusting the light intensity.
 
 ## Conclusion
 

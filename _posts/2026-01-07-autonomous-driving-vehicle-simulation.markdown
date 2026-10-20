@@ -55,14 +55,14 @@ cd ~/workspace/src
 git clone git@github.com:workabotic/gazebo_ackermann_steering_vehicle.git
 ```
 
-At this stage, it was necessary to install the Python dependencies required by the project. To achieve this, a Python virtual environment named **.venv** was created and activated. Unlike a fully isolated virtual environment, this environment was configured to allow access to system-wide Python packages, enabling proper integration with the ROS 2 Python ecosystem. This approach was required because some ROS 2 dependencies, such as **cv_bridge** and **OpenCV**, are provided by the system and must be accessible at runtime alongside the Python packages installed within the virtual environment. The virtual environment was created and activated using the commands shown below:
+At this stage, it was necessary to install the Python dependencies required by the project. To achieve this, a Python virtual environment named `.venv` was created and activated. Unlike a fully isolated virtual environment, this environment was configured to allow access to system-wide Python packages, enabling proper integration with the ROS 2 Python ecosystem. This approach was required because some ROS 2 dependencies, such as `cv_bridge` and **OpenCV**, are provided by the system and must be accessible at runtime alongside the Python packages installed within the virtual environment. The virtual environment was created and activated using the commands shown below:
 
 
 ```bash
 python3 -m venv ~/.venv --system-site-packages
 ```
 
-After activating the virtual environment, the required Python dependencies were installed using **pip**. These dependencies were used for data processing tasks as well as for handling neural network training and inference within the project. The commands presented below were used to install the dependencies:
+After activating the virtual environment, the required Python dependencies were installed using `pip`. These dependencies were used for data processing tasks as well as for handling neural network training and inference within the project. The commands presented below were used to install the dependencies:
 
 ```bash
 source ~/.venv/bin/activate
@@ -97,12 +97,12 @@ In this project, multiple racing tracks were created to generate different drivi
 
 ### Racing Tracks
 
-Four racing tracks with different shapes were designed using [Blender](https://www.blender.org/) and integrated into the Gazebo simulator to provide different driving environments. To increase variability in the collected data, each track was created with distinct background textures, including dirt, sand, snow, and grass. In addition to varying the track shapes and background, modifications were also applied to the boundary stripe colors, enhancing dataset diversity. After modeling, the tracks were exported from Blender as **.obj** and **.mtl** files, along with their corresponding background texture assets, and were placed in the [project repository](https://github.com/lucasmazzetto/gazebo_racing_tracks/tree/main/worlds/meshes) for download.
+Four racing tracks with different shapes were designed using [Blender](https://www.blender.org/) and integrated into the Gazebo simulator to provide different driving environments. To increase variability in the collected data, each track was created with distinct background textures, including dirt, sand, snow, and grass. In addition to varying the track shapes and background, modifications were also applied to the boundary stripe colors, enhancing dataset diversity. After modeling, the tracks were exported from Blender as `.obj` and `.mtl` files, along with their corresponding background texture assets, and were placed in the [project repository](https://github.com/lucasmazzetto/gazebo_racing_tracks/tree/main/worlds/meshes) for download.
 
 ![Racing tracks designed with Blender]({{ site.url }}{{ site.baseurl }}/public/images/autonomous-driving-vehicle-simulation/racing-tracks-designed-with-blender.webp)
 *Figure 1 — Racing tracks designed with Blender.*
 
-To manage these environments within the simulation, a new ROS 2 package named **gazebo_racing_tracks** was created inside the workspace. This package was added to the workspace’s src directory ensuring that all resources could be used within the project. To do this, the following commands were executed to create the package:
+To manage these environments within the simulation, a new ROS 2 package named `gazebo_racing_tracks` was created inside the workspace. This package was added to the workspace’s src directory ensuring that all resources could be used within the project. To do this, the following commands were executed to create the package:
 
 ```bash
 cd ~/workspace/src
@@ -110,7 +110,7 @@ cd ~/workspace/src
 ros2 pkg create gazebo_racing_tracks --build-type ament_cmake
 ```
 
-Then, a directory named **worlds/meshes** was created inside the **gazebo_racing_tracks** package, and the racing track files were moved into **gazebo_racing_tracks/worlds/meshes** for proper use in the project.
+Then, a directory named `worlds/meshes` was created inside the `gazebo_racing_tracks` package, and the racing track files were moved into `gazebo_racing_tracks/worlds/meshes` for proper use in the project.
 
 ```bash
 mkdir -p ~/workspace/src/gazebo_racing_tracks/worlds/meshes
@@ -118,7 +118,7 @@ mkdir -p ~/workspace/src/gazebo_racing_tracks/worlds/meshes
 mv ~/meshes/* ~/workspace/src/gazebo_racing_tracks/worlds/meshes
 ```
 
-As a result, the **gazebo_racing_tracks** package then had the following directory structure:
+As a result, the `gazebo_racing_tracks` package then had the following directory structure:
 
 
 ```text
@@ -141,9 +141,9 @@ gazebo_racing_tracks/
 └── package.xml
 ```
 
-To use the tracks in Gazebo, it was necessary to create corresponding world files and link them to the track assets. This required four world files representing each track in the simulator: **dirt_track.sdf**, **sand_track.sdf**, **snow_track.sdf**, and **grass_track.sdf**. These files defined the environment, including textures and any additional elements, ensuring that Gazebo could load and simulate each track correctly.
+To use the tracks in Gazebo, it was necessary to create corresponding world files and link them to the track assets. This required four world files representing each track in the simulator: `dirt_track.sdf`, `sand_track.sdf`, `snow_track.sdf`, and `grass_track.sdf`. These files defined the environment, including textures and any additional elements, ensuring that Gazebo could load and simulate each track correctly.
 
-The **dirt_track.sdf** file was created inside the **gazebo_racing_tracks/worlds** folder, and the following Gazebo world definition was inserted:
+The `dirt_track.sdf` file was created inside the `gazebo_racing_tracks/worlds` folder, and the following Gazebo world definition was inserted:
 
 ```xml
 <?xml version="1.0" ?>
@@ -194,7 +194,7 @@ The **dirt_track.sdf** file was created inside the **gazebo_racing_tracks/worlds
 </sdf>
 ```
 
-For the sand track, a file named **sand_track.sdf** was placed in the **gazebo_racing_tracks/worlds** folder, and the track was defined using the following world definition:
+For the sand track, a file named `sand_track.sdf` was placed in the `gazebo_racing_tracks/worlds` folder, and the track was defined using the following world definition:
 
 ```xml
 <?xml version="1.0" ?>
@@ -245,7 +245,7 @@ For the sand track, a file named **sand_track.sdf** was placed in the **gazebo_r
 </sdf>
 ```
 
-To set up the snow track, a **snow_track.sdf** file was created within **gazebo_racing_tracks/worlds**, and the following world details were inserted for Gazebo:
+To set up the snow track, a `snow_track.sdf` file was created within `gazebo_racing_tracks/worlds`, and the following world details were inserted for Gazebo:
 
 ```xml
 <?xml version="1.0" ?>
@@ -296,7 +296,7 @@ To set up the snow track, a **snow_track.sdf** file was created within **gazebo_
 </sdf>
 ```
 
-Finally, for the grass track, a **grass_track.sdf** file was added inside the **gazebo_racing_tracks/worlds** directory, and it was filled with the following world definition:
+Finally, for the grass track, a `grass_track.sdf` file was added inside the `gazebo_racing_tracks/worlds` directory, and it was filled with the following world definition:
 
 ```xml
 <?xml version="1.0" ?>
@@ -348,7 +348,7 @@ Finally, for the grass track, a **grass_track.sdf** file was added inside the **
 ```
 
 
-It was also necessary to modify the **CMakeLists.txt** file to include the **gazebo_racing_tracks/worlds** directory. This ensured that the track files could be properly located by other ROS packages within the same workspace, simplifying their integration across different packages. Consequently, the **CMakeLists.txt** content was updated as follows:
+It was also necessary to modify the `CMakeLists.txt` file to include the `gazebo_racing_tracks/worlds` directory. This ensured that the track files could be properly located by other ROS packages within the same workspace, simplifying their integration across different packages. Consequently, the `CMakeLists.txt` content was updated as follows:
 
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -375,7 +375,7 @@ endif()
 ament_package()
 ```
 
-Once all steps had been carried out correctly, the **gazebo_racing_tracks** package directory presented the following structure:
+Once all steps had been carried out correctly, the `gazebo_racing_tracks` package directory presented the following structure:
 
 ```text
 gazebo_racing_tracks/
@@ -401,7 +401,7 @@ gazebo_racing_tracks/
 └── package.xml
 ```
 
-After the **gazebo_racing_tracks** package was set up, the workspace was accessed, and the project was built using colcon build. This step compiled all packages in the workspace and ensured that the tracks and associated files were properly recognized by ROS 2. In summary, the command used was:
+After the `gazebo_racing_tracks` package was set up, the workspace was accessed, and the project was built using colcon build. This step compiled all packages in the workspace and ensured that the tracks and associated files were properly recognized by ROS 2. In summary, the command used was:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -415,11 +415,11 @@ colcon build
 
 ### Dataset Collection
 
-For the dataset creation, after the **gazebo_racing_tracks** package had been set up, the **gazebo_ackermann_steering_vehicle** package was also required. As mentioned before, this package is available on the [project’s repository](https://github.com/workabotic/gazebo_ackermann_steering_vehicle) page and could be cloned directly into the workspace folder. Alternatively, it is possible to look at the [documentation](https://workabotic.com/2025/ackermann-steering-vehicle-simulation/) and follow it to develop a custom vehicle model instead.
+For the dataset creation, after the `gazebo_racing_tracks` package had been set up, the `gazebo_ackermann_steering_vehicle` package was also required. As mentioned before, this package is available on the [project’s repository](https://github.com/workabotic/gazebo_ackermann_steering_vehicle) page and could be cloned directly into the workspace folder. Alternatively, it is possible to look at the [documentation](https://workabotic.com/2025/ackermann-steering-vehicle-simulation/) and follow it to develop a custom vehicle model instead.
 
-Anyway, after these dependencies were in place, it was time to create a new package responsible for handling data collection and managing the neural network related tasks, such as training and inference. This package was named **autopilot_neural_network**, as it brought all these functions together. The entire package, including its nodes and useful scripts, was developed in **Python**. From that point onward, this package was used and updated continuously until the end of this project.
+Anyway, after these dependencies were in place, it was time to create a new package responsible for handling data collection and managing the neural network related tasks, such as training and inference. This package was named `autopilot_neural_network`, as it brought all these functions together. The entire package, including its nodes and useful scripts, was developed in **Python**. From that point onward, this package was used and updated continuously until the end of this project.
 
-To create the **autopilot_neural_network** package, the workspace source directory was first accessed. Then, a new ROS 2 Python package was generated using **ament_python** as the build system, while explicitly declaring its runtime dependencies. The commands executed to perform these steps are shown below:
+To create the `autopilot_neural_network` package, the workspace source directory was first accessed. Then, a new ROS 2 Python package was generated using `ament_python` as the build system, while explicitly declaring its runtime dependencies. The commands executed to perform these steps are shown below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -433,7 +433,7 @@ ros2 pkg create autopilot_neural_network \
   --dependencies rclpy sensor_msgs std_msgs cv_bridge
 ```
 
-The following directory structure was then created, with the **autopilot_neural_network/autopilot_neural_network** folder serving as the default location for the Python nodes:
+The following directory structure was then created, with the `autopilot_neural_network/autopilot_neural_network` folder serving as the default location for the Python nodes:
 
 ```bash
 autopilot_neural_network/
@@ -446,7 +446,7 @@ autopilot_neural_network/
 └── setup.cfg
 ```
 
-Because ROS 2 Python nodes may attempt to use the system Python interpreter instead of the one provided by the active virtual environment, the colcon configuration was adjusted to ensure that the active environment was used. In summary, this guaranteed that both the build and execution processes relied on the Python interpreter from the sourced virtual environment rather than the system default. To do this, **autopilot_neural_network/setup.cfg** was updated by adding the appropriate configuration section, as shown below, ensuring that the correct Python interpreter was used during execution and installation:
+Because ROS 2 Python nodes may attempt to use the system Python interpreter instead of the one provided by the active virtual environment, the colcon configuration was adjusted to ensure that the active environment was used. In summary, this guaranteed that both the build and execution processes relied on the Python interpreter from the sourced virtual environment rather than the system default. To do this, `autopilot_neural_network/setup.cfg` was updated by adding the appropriate configuration section, as shown below, ensuring that the correct Python interpreter was used during execution and installation:
 
 ```bash
 [develop]
@@ -459,11 +459,11 @@ executable=/usr/bin/env python3
 
 After that, the main idea was to create a data collector software. Its primary goal was to gather data from the vehicle while it was being manually driven. Additionally, it needed to receive vehicle parameters, such as maximum velocity and maximum steering angle, so that the collected data can later be normalized during the training process.
 
-However, these parameters were already defined in the **gazebo_ackermann_steering_vehicle** package, specifically within the **vehicle_controller** node. To avoid duplicating configuration and to improve maintainability, it was decided to retrieve these parameters directly from the **vehicle_controller** node. Furthermore, this design was intended to be extensible for any other parameters, not just maximum velocity or maximum steering angle. As a result, a class was created to request any desired parameter from other nodes, which could then be inherited by other classes, serving as a generic parameters client node.
+However, these parameters were already defined in the `gazebo_ackermann_steering_vehicle` package, specifically within the `vehicle_controller` node. To avoid duplicating configuration and to improve maintainability, it was decided to retrieve these parameters directly from the `vehicle_controller` node. Furthermore, this design was intended to be extensible for any other parameters, not just maximum velocity or maximum steering angle. As a result, a class was created to request any desired parameter from other nodes, which could then be inherited by other classes, serving as a generic parameters client node.
 
-Building on this approach, the **ParametersClientNode** class was designed to retrieve parameters from other ROS 2 nodes through synchronous service calls to the **GetParameters** service. The decision to use synchronous calls to the **GetParameters** service was motivated by the need to access these values during node initialization, before the main execution logic could safely proceed. The class creates a client for the target node, waits for the service to become available, and blocks execution until the requested parameters are returned or a timeout occurs.
+Building on this approach, the `ParametersClientNode` class was designed to retrieve parameters from other ROS 2 nodes through synchronous service calls to the `GetParameters` service. The decision to use synchronous calls to the `GetParameters` service was motivated by the need to access these values during node initialization, before the main execution logic could safely proceed. The class creates a client for the target node, waits for the service to become available, and blocks execution until the requested parameters are returned or a timeout occurs.
 
-Once a response is received, the returned **ParameterValue** messages are converted into native Python types through the **_extract_parameter_value** method, which supports both scalar and array parameter types. To keep the interface flexible while remaining convenient to use, the **request_parameters** method was designed to return a single value when only one parameter is requested, or a tuple of values when multiple parameters are requested, preserving the original request order. With this structure, other nodes can simply inherit from **ParametersClientNode** and synchronously fetch any required parameters at startup without duplicating logic. The **ParametersClientNode** class was implemented in the **parameters_client_node.py** file, located inside the **autopilot_neural_network/autopilot_neural_network** directory, and the full implementation is shown below:
+Once a response is received, the returned `ParameterValue` messages are converted into native Python types through the `_extract_parameter_value` method, which supports both scalar and array parameter types. To keep the interface flexible while remaining convenient to use, the `request_parameters` method was designed to return a single value when only one parameter is requested, or a tuple of values when multiple parameters are requested, preserving the original request order. With this structure, other nodes can simply inherit from `ParametersClientNode` and synchronously fetch any required parameters at startup without duplicating logic. The `ParametersClientNode` class was implemented in the `parameters_client_node.py` file, located inside the `autopilot_neural_network/autopilot_neural_network` directory, and the full implementation is shown below:
 
 
 ```python
@@ -574,17 +574,17 @@ class ParametersClientNode(Node):
                 return None
 ```
 
-As a result, the **DataCollector** class was then implemented as a node inheriting from **ParametersClientNode**. Its purpose was to retrieve the vehicle’s parameters, subscribe to the vehicle’s camera, steering, and velocity topics, and continuously gather synchronized state information. By using the **request_parameters** method from the parent class, the **DataCollector** could access values such as maximum velocity and steering limits while focusing on monitoring incoming data and determining when a valid sample was available for storage.
+As a result, the `DataCollector` class was then implemented as a node inheriting from `ParametersClientNode`. Its purpose was to retrieve the vehicle’s parameters, subscribe to the vehicle’s camera, steering, and velocity topics, and continuously gather synchronized state information. By using the `request_parameters` method from the parent class, the `DataCollector` could access values such as maximum velocity and steering limits while focusing on monitoring incoming data and determining when a valid sample was available for storage.
 
 The data collection loop worked by continuously updating the latest steering, velocity, and image messages as they arrived, each tagged with its own timestamp. Instead of forcing strict synchronization, the node simply checked during the periodic update whether all fields had been refreshed recently enough and whether the vehicle was moving above a minimum speed threshold. When these conditions were met, the current state was treated as a synchronized snapshot of the system, and the sample was saved. This ensured that the steering angle, velocity, and camera frame all referred to roughly the same moment in time, so the model could learn from the commands that the vehicle was actually following, keeping the dataset consistent for training.
 
-To keep this node flexible for whatever future projects might need it, the **DataCollector** was also designed to load some parameters for itself at startup, allowing the redefinition of which node provides vehicle data and which topics should be monitored. Parameters like **vehicle_node**, **image_topic**, **velocity_topic**, and **steering_angle_topic** made the node easy to adjust for setups that didn’t use the **vehicle_controller** node or that required receiving data under different topic names.
+To keep this node flexible for whatever future projects might need it, the `DataCollector` was also designed to load some parameters for itself at startup, allowing the redefinition of which node provides vehicle data and which topics should be monitored. Parameters like `vehicle_node`, `image_topic`, `velocity_topic`, and `steering_angle_topic` made the node easy to adjust for setups that didn’t use the `vehicle_controller` node or that required receiving data under different topic names.
 
-In addition, the parameters **max_velocity_parameter** and **max_steering_angle_parameter** were added to allow changing the vehicle parameter names used to fetch the maximum velocity and maximum steering angle when necessary, keeping the node flexible across different configurations. Additional parameters also provided control over the data collection process: **dataset_path** defined where images and CSV metadata should be stored, **update_period** set how frequently the main loop evaluated the current state, **timeout_time** specified how long data could remain unrefreshed before being considered invalid, and **min_velocity_factor** determined the minimum percentage of the maximum velocity required for a sample to be stored.
+In addition, the parameters `max_velocity_parameter` and `max_steering_angle_parameter` were added to allow changing the vehicle parameter names used to fetch the maximum velocity and maximum steering angle when necessary, keeping the node flexible across different configurations. Additional parameters also provided control over the data collection process: `dataset_path` defined where images and CSV metadata should be stored, `update_period` set how frequently the main loop evaluated the current state, `timeout_time` specified how long data could remain unrefreshed before being considered invalid, and `min_velocity_factor` determined the minimum percentage of the maximum velocity required for a sample to be stored.
 
-Also, to handle the incoming data in an organized way, a **VehicleState** dataclass was added to group together the latest camera frame, steering angle, velocity, and their timestamps into one data structure. This state object was what got passed to the storage layer. Saving each sample was handled by the **CsvDataStorage** class, which made sure the dataset directory existed, gave each image a sequential ID, and stored them as PNG files. It also wrote a matching row in a CSV file with the state values, timestamps, and vehicle limits.
+Also, to handle the incoming data in an organized way, a `VehicleState` dataclass was added to group together the latest camera frame, steering angle, velocity, and their timestamps into one data structure. This state object was what got passed to the storage layer. Saving each sample was handled by the `CsvDataStorage` class, which made sure the dataset directory existed, gave each image a sequential ID, and stored them as PNG files. It also wrote a matching row in a CSV file with the state values, timestamps, and vehicle limits.
 
-The complete implementation of all this logic was placed in the **data_collector.py** file inside the **autopilot_neural_network/autopilot_neural_network** directory, with the full code shown below:
+The complete implementation of all this logic was placed in the `data_collector.py` file inside the `autopilot_neural_network/autopilot_neural_network` directory, with the full code shown below:
 
 ```python
 import os
@@ -882,13 +882,13 @@ if __name__ == '__main__':
     main()
 ```
 
-When the **DataCollector** was added to the system, it became necessary to define a parameters file to centralize all configuration values required by the node. These parameters were declared within the node and loaded from an external file, allowing the node’s behavior to be adjusted without modifying the source code. As a result, configuration details are separated from the implementation logic, making the system easier to maintain and adapt. To support this approach, a **config** directory was created inside the package to store configuration files. The command executed below was used to create this directory:
+When the `DataCollector` was added to the system, it became necessary to define a parameters file to centralize all configuration values required by the node. These parameters were declared within the node and loaded from an external file, allowing the node’s behavior to be adjusted without modifying the source code. As a result, configuration details are separated from the implementation logic, making the system easier to maintain and adapt. To support this approach, a `config` directory was created inside the package to store configuration files. The command executed below was used to create this directory:
 
 ```bash
 mkdir -p ~/workspace/src/autopilot_neural_network/config
 ```
 
-The parameter values were defined in the **parameters.yaml** file located in the **autopilot_neural_network/config** directory, and its content was defined as follows:
+The parameter values were defined in the `parameters.yaml` file located in the `autopilot_neural_network/config` directory, and its content was defined as follows:
 
 
 ```yaml
@@ -911,15 +911,15 @@ The parameter values were defined in the **parameters.yaml** file located in the
     dataset_path: "/tmp/autopilot_neural_network/dataset" # Path where dataset is saved and loaded
 ```
 
-The parameters defined in this configuration file must be adjusted according to the intended data collection setup and storage location. In particular, the **dataset_path** parameter specifies where the recorded data are saved and later accessed during training, and it can be modified to match the desired directory structure. For example, during this project the dataset path was changed to **/home/user/autopilot_neural_network/dataset**, ensuring that all collected data was stored in a persistent location suitable for training.
+The parameters defined in this configuration file must be adjusted according to the intended data collection setup and storage location. In particular, the `dataset_path` parameter specifies where the recorded data are saved and later accessed during training, and it can be modified to match the desired directory structure. For example, during this project the dataset path was changed to `/home/user/autopilot_neural_network/dataset`, ensuring that all collected data was stored in a persistent location suitable for training.
 
-To tie everything together, a launch file was created. This launch file was responsible for starting the **data_collector** node and passing the **parameters.yaml** file at runtime, so all required configuration values are available as soon as the node starts. To organize the system startup files, a dedicated launch directory was created inside the package to store launch scripts. The command executed below was used to create this directory:
+To tie everything together, a launch file was created. This launch file was responsible for starting the `data_collector` node and passing the `parameters.yaml` file at runtime, so all required configuration values are available as soon as the node starts. To organize the system startup files, a dedicated launch directory was created inside the package to store launch scripts. The command executed below was used to create this directory:
 
 ```bash
 mkdir -p ~/workspace/src/autopilot_neural_network/launch
 ```
 
-The launch file was placed in the **autopilot_neural_network/launch** directory in a file named **data_collector.launch.py**, and its implementation is shown next:
+The launch file was placed in the `autopilot_neural_network/launch` directory in a file named `data_collector.launch.py`, and its implementation is shown next:
 
 ```python
 import os
@@ -949,7 +949,7 @@ def generate_launch_description():
     return LaunchDescription([data_collector_node])
 ```
 
-Finally, it was necessary to update the **autopilot_neural_network/setup.py** file to properly integrate the new node into the package. This update ensures that the node can be executed as a console script, while also installing the launch and configuration files so they are available at runtime through the package share directory. To make the launch files and parameter definitions accessible through the ROS 2 package, the **autopilot_neural_network/launch** and **autopilot_neural_network/config** directories were added to the package data files, ensuring they are properly installed alongside the package. The updated **setup.py** file is shown below.
+Finally, it was necessary to update the `autopilot_neural_network/setup.py` file to properly integrate the new node into the package. This update ensures that the node can be executed as a console script, while also installing the launch and configuration files so they are available at runtime through the package share directory. To make the launch files and parameter definitions accessible through the ROS 2 package, the `autopilot_neural_network/launch` and `autopilot_neural_network/config` directories were added to the package data files, ensuring they are properly installed alongside the package. The updated `setup.py` file is shown below.
 
 
 ```python
@@ -990,7 +990,7 @@ setup(
 )
 ```
 
-From this point on, the **autopilot_neural_network** directory had the following structure:
+From this point on, the `autopilot_neural_network` directory had the following structure:
 
 ```bash
 autopilot_neural_network/
@@ -1023,7 +1023,7 @@ colcon build
 
 Next, the vehicle was manually driven on the dirt, sand, and snow tracks for many hours, ensuring that a sufficiently large and diverse dataset was gathered to train the model. The grass track was intentionally excluded from the training process and reserved for testing and evaluating the model’s ability to generalize to unseen environments.
 
-To launch the setup for collecting training data, the workspace environment was first accessed in a terminal. The ROS 2 environment was then initialized by sourcing both the global ROS installation and the local workspace setup files. After the environment was properly configured, the simulation was started by launching the **vehicle.launch.py** file from the **gazebo_ackermann_steering_vehicle** package, while passing the desired world file as a parameter. The world path was obtained using **$(ros2 pkg prefix gazebo_racing_tracks)**, ensuring that the track description was used, as shown by the commands below:
+To launch the setup for collecting training data, the workspace environment was first accessed in a terminal. The ROS 2 environment was then initialized by sourcing both the global ROS installation and the local workspace setup files. After the environment was properly configured, the simulation was started by launching the `vehicle.launch.py` file from the `gazebo_ackermann_steering_vehicle` package, while passing the desired world file as a parameter. The world path was obtained using `$(ros2 pkg prefix gazebo_racing_tracks)`, ensuring that the track description was used, as shown by the commands below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash 
@@ -1038,7 +1038,7 @@ ros2 launch gazebo_ackermann_steering_vehicle vehicle.launch.py \
   world:=$(ros2 pkg prefix gazebo_racing_tracks)/share/gazebo_racing_tracks/worlds/dirt_track.sdf
 ```
 
-In parallel, an Xbox One game controller was connected to the computer to enable manual drive of the vehicle. In a separate terminal, the workspace was accessed again and both the global ROS 2 and local workspace environments were sourced. With the environment properly set up, the **joystick.launch.py** from the **gazebo_ackermann_steering_vehicle** package was launched to establish the connection between the joystick and the simulation, as demonstrated by the commands that follow:
+In parallel, an Xbox One game controller was connected to the computer to enable manual drive of the vehicle. In a separate terminal, the workspace was accessed again and both the global ROS 2 and local workspace environments were sourced. With the environment properly set up, the `joystick.launch.py` from the `gazebo_ackermann_steering_vehicle` package was launched to establish the connection between the joystick and the simulation, as demonstrated by the commands that follow:
 
 
 ```bash
@@ -1053,7 +1053,7 @@ source install/setup.bash
 ros2 launch gazebo_ackermann_steering_vehicle joystick.launch.py
 ```
 
-In a third terminal, the workspace was accessed once more and both the global ROS 2 installation and the local workspace environment were sourced again. With the environment fully initialized, the **data_collector.launch.py** file from the **autopilot_neural_network** package was launched, completing the system setup and enabling the collection of vehicle data for gathering the dataset, as detailed in the commands presented below:
+In a third terminal, the workspace was accessed once more and both the global ROS 2 installation and the local workspace environment were sourced again. With the environment fully initialized, the `data_collector.launch.py` file from the `autopilot_neural_network` package was launched, completing the system setup and enabling the collection of vehicle data for gathering the dataset, as detailed in the commands presented below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash 
@@ -1067,24 +1067,24 @@ source install/setup.bash
 ros2 launch autopilot_neural_network data_collector.launch.py
 ```
 
-Finally, **RViz** was opened and an **Image** display was added, subscribing to the **/camera/image_raw** topic to visualize the view from the vehicle’s front camera. This visualization played an important role during dataset collection, as it was used to keep the vehicle aligned within the track boundaries. Special care was taken to drive as accurately as possible, avoiding situations where the vehicle would leave the track.
+Finally, **RViz** was opened and an **Image** display was added, subscribing to the `/camera/image_raw` topic to visualize the view from the vehicle’s front camera. This visualization played an important role during dataset collection, as it was used to keep the vehicle aligned within the track boundaries. Special care was taken to drive as accurately as possible, avoiding situations where the vehicle would leave the track.
 
 ![Gathering data while driving the vehicle]({{ site.url }}{{ site.baseurl }}/public/images/autonomous-driving-vehicle-simulation/rviz-visualization-while-driving-the-vehicle.gif)
 *Figure 2 — RViz visualization while driving the vehicle.*
 
-As mentioned before, the same procedure was then repeated for the other tracks. To switch tracks, it was only necessary to update the **vehicle.launch.py** command by replacing **dirt_track.sdf** with either **snow_track.sdf** or **sand_track.sdf**. During this process, more than 5,000 frames were collected, along with their associated data.
+As mentioned before, the same procedure was then repeated for the other tracks. To switch tracks, it was only necessary to update the `vehicle.launch.py` command by replacing `dirt_track.sdf` with either `snow_track.sdf` or `sand_track.sdf`. During this process, more than 5,000 frames were collected, along with their associated data.
 
 ### Neural Network Training 
 
 After the data were collected, the design of the neural network was initiated. All training was performed offline, with the complete dataset available from the beginning. To accomplish this, a model architecture was designed to receive an image as input and to output both the steering angle and the desired velocity. In addition, a custom data loader was implemented to load the dataset and apply data augmentation techniques, increasing data variability and improving generalization. A dedicated loss function was defined, and a training script was developed, with the hyperparameters empirically tuned to achieve satisfactory performance.
 
-A new directory named **scripts/** was created inside the **autopilot_neural_network** package to separate the training scripts from the ROS 2 nodes and to keep the project organized. All training scripts, along with other utility scripts required, were placed in this directory. To create this directory, the following command was used:
+A new directory named `scripts/` was created inside the `autopilot_neural_network` package to separate the training scripts from the ROS 2 nodes and to keep the project organized. All training scripts, along with other utility scripts required, were placed in this directory. To create this directory, the following command was used:
 
 ```bash
 mkdir -p ~/workspace/src/autopilot_neural_network/scripts
 ```
 
-It was also necessary to create an empty **__init__.py** file inside the scripts directory. This was required because some of the code located in this directory was used by the ROS 2 package, and the presence of this file ensured that the directory was recognized as a Python module. To accomplish this, the next command was executed:
+It was also necessary to create an empty `__init__.py` file inside the scripts directory. This was required because some of the code located in this directory was used by the ROS 2 package, and the presence of this file ensured that the directory was recognized as a Python module. To accomplish this, the next command was executed:
 
 ```bash
 touch ~/workspace/src/autopilot_neural_network/scripts/__init__.py
@@ -1094,7 +1094,7 @@ touch ~/workspace/src/autopilot_neural_network/scripts/__init__.py
 
 The proposed model architecture was inspired by the [LeNet](http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf), a very simple and lightweight Convolutional Neural Network. The network was designed around a shared convolutional backbone responsible for extracting visual features from the input image, followed by a split into two independent regression heads.
 
-The convolutional backbone applied successive convolution, pooling, and ReLU operations to extract and compress visual information, while dropout was used to improve generalization. The resulting feature maps were flattened and processed by shared fully connected layers to form a compact representation, which was then fed into two regression heads for steering angle and velocity estimation. The implementation of this model was placed in the **autopilot_neural_network/scripts/model.py** file, with the corresponding code shown below:
+The convolutional backbone applied successive convolution, pooling, and ReLU operations to extract and compress visual information, while dropout was used to improve generalization. The resulting feature maps were flattened and processed by shared fully connected layers to form a compact representation, which was then fed into two regression heads for steering angle and velocity estimation. The implementation of this model was placed in the `autopilot_neural_network/scripts/model.py` file, with the corresponding code shown below:
 
 
 ```python
@@ -1200,13 +1200,13 @@ The model was opened in [Netron](https://github.com/lutzroeder/netron) to visual
 
 #### Data Loader
 
-The data loading pipeline was built using a custom PyTorch **Dataset** that read image paths and driving commands from a CSV file and returned preprocessed samples for training and validation. For each sample, the image was loaded from disk, while the velocity and steering values were extracted and normalized using the maximum values provided in the CSV.
+The data loading pipeline was built using a custom PyTorch `Dataset` that read image paths and driving commands from a CSV file and returned preprocessed samples for training and validation. For each sample, the image was loaded from disk, while the velocity and steering values were extracted and normalized using the maximum values provided in the CSV.
 
 The images were processed through a fixed preprocessing step that converted them to grayscale, resized them to a fixed resolution, transformed them into tensors, and applied normalization. During training, data augmentation was used to improve generalization. This included changes in brightness and contrast, along with small geometric transformations such as rotations, perspective distortion, Gaussian blur, and random horizontal flipping, with the steering angle inverted to keep the labels consistent.
 
-The **preprocessing_transform** function was defined outside the **Data** class because it was also used during the inference stage. In this case, input data arrived in a ROS 2 format and needed to be preprocessed before being passed through the model. By keeping this transformation separate, the same resizing, grayscale conversion, tensor conversion, and normalization steps used during training could be applied during inference, ensuring that the model received inputs in the same format for both training and inference.
+The `preprocessing_transform` function was defined outside the `Data` class because it was also used during the inference stage. In this case, input data arrived in a ROS 2 format and needed to be preprocessed before being passed through the model. By keeping this transformation separate, the same resizing, grayscale conversion, tensor conversion, and normalization steps used during training could be applied during inference, ensuring that the model received inputs in the same format for both training and inference.
 
-All of this code was implemented in the **autopilot_neural_network/scripts/dataset.py** file, with the corresponding implementation shown next:
+All of this code was implemented in the `autopilot_neural_network/scripts/dataset.py` file, with the corresponding implementation shown next:
 
 ```python
 import os
@@ -1375,11 +1375,11 @@ where $$\hat{v}_i$$ and $$\hat{\theta}_i$$ are the predicted velocity and steeri
 
 #### Training Loop
 
-An imbalance in the steering angle distribution was observed in the training dataset, primarily because a large portion of the collected data corresponded to the vehicle driving straight ahead. As a result, most samples had steering angles close to zero, which biased the learning process. To address this issue, the **SteeringBalancedSampler** was developed.
+An imbalance in the steering angle distribution was observed in the training dataset, primarily because a large portion of the collected data corresponded to the vehicle driving straight ahead. As a result, most samples had steering angles close to zero, which biased the learning process. To address this issue, the `SteeringBalancedSampler` was developed.
 
 This sampler addresses the steering-angle imbalance by first normalizing the steering values using their maximum magnitudes and then separating samples into low steering and high steering groups based on a threshold defined as a fraction of the maximum steering angle. All high steering samples are retained to preserve turning maneuvers, while low steering samples are downsampled to a fixed fraction of the dataset. The resulting set of indices is used during training to produce a more balanced sampling of steering behaviors, encouraging the model to learn steering control more effectively without completely discarding straight driving data. 
 
-The code below shows the implementation of the sampler used during training, placed in the **autopilot_neural_network/scripts/sampler.py** file:
+The code below shows the implementation of the sampler used during training, placed in the `autopilot_neural_network/scripts/sampler.py` file:
 
 
 ```python
@@ -1451,11 +1451,11 @@ class SteeringBalancedSampler(Sampler):
         return len(self.indices)
 ```
 
-Following the introduction of the balanced sampling strategy, the complete training procedure was implemented in a dedicated Python script that integrates all previously described components into a unified workflow. Built on top of PyTorch, the script combines the neural network architecture, custom dataset and preprocessing pipeline, weighted loss function, and the sampler to form the core of the learning process. Standard PyTorch utilities are used for data loading, optimization, and learning rate scheduling, while additional tools such as **tqdm** and **TensorBoard** supported progress visualization and experiment monitoring.
+Following the introduction of the balanced sampling strategy, the complete training procedure was implemented in a dedicated Python script that integrates all previously described components into a unified workflow. Built on top of PyTorch, the script combines the neural network architecture, custom dataset and preprocessing pipeline, weighted loss function, and the sampler to form the core of the learning process. Standard PyTorch utilities are used for data loading, optimization, and learning rate scheduling, while additional tools such as `tqdm` and **TensorBoard** supported progress visualization and experiment monitoring.
 
-The script initialized the model and constructed the training and validation datasets using the custom **Data** class, which were then split according to a configurable validation fraction. During training, the balanced sampler was applied exclusively to the training subset, while the validation data were processed without augmentation or sampling bias. Optimization was performed using the Adam optimizer together with the weighted mean squared error loss previously described, and a learning rate scheduler dynamically adjusted the learning rate based on validation loss. At each epoch, the model was trained and evaluated, performance metrics were logged, and the best-performing model was saved automatically.
+The script initialized the model and constructed the training and validation datasets using the custom `Data` class, which were then split according to a configurable validation fraction. During training, the balanced sampler was applied exclusively to the training subset, while the validation data were processed without augmentation or sampling bias. Optimization was performed using the Adam optimizer together with the weighted mean squared error loss previously described, and a learning rate scheduler dynamically adjusted the learning rate based on validation loss. At each epoch, the model was trained and evaluated, performance metrics were logged, and the best-performing model was saved automatically.
 
-The complete implementation of the training script, bringing together all components of the learning process into a single file, is presented below and was placed in the **autopilot_neural_network/scripts/train.py** file.
+The complete implementation of the training script, bringing together all components of the learning process into a single file, is presented below and was placed in the `autopilot_neural_network/scripts/train.py` file.
 
 ```python
 import os
@@ -1871,7 +1871,7 @@ if __name__ == "__main__":
 
 In summary, the training procedure was configured using a set of hyperparameters that were determined empirically based on observed convergence behavior and validation performance. While these values produced satisfactory results, further optimization could be achieved through systematic hyperparameter tuning, improving training and model accuracy. 
 
-To execute the training process, the script was run from the **scripts/** directory inside the package, invoking the training file from the terminal and providing the required **dataset_path** and **model_path** arguments. The instructions used to launch the training process are shown next:
+To execute the training process, the script was run from the `scripts/` directory inside the package, invoking the training file from the terminal and providing the required `dataset_path` and `model_path` arguments. The instructions used to launch the training process are shown next:
 
 ```bash
 source ~/.venv/bin/activate
@@ -1884,9 +1884,9 @@ python3 train.py --dataset_path ~/autopilot_neural_network/dataset \
 
 ### Inference Node
 
-After the training was completed and a model was obtained, an inference node was developed to deploy the trained network within the system. This node, named **autopilot**, was implemented through the **Autopilot** class and was responsible for performing real-time inference using the trained neural network to output velocity and steering commands from incoming camera images. To properly scale the network outputs, the node also required access to the vehicle’s maximum velocity and maximum steering angle parameters, which were provided by the **vehicle_controller** node. For this reason, the **autopilot** node inherited from the **ParametersClientNode**, allowing it to request these parameters at startup.
+After the training was completed and a model was obtained, an inference node was developed to deploy the trained network within the system. This node, named `autopilot`, was implemented through the `Autopilot` class and was responsible for performing real-time inference using the trained neural network to output velocity and steering commands from incoming camera images. To properly scale the network outputs, the node also required access to the vehicle’s maximum velocity and maximum steering angle parameters, which were provided by the `vehicle_controller` node. For this reason, the `autopilot` node inherited from the `ParametersClientNode`, allowing it to request these parameters at startup.
 
-In addition to the vehicle specific parameters retrieved at startup, the **autopilot** node relied on other configuration parameters to define its runtime behavior and data interfaces. These included the names of the ROS 2 topics used to receive camera images and to publish velocity and steering commands, ensuring proper integration with the rest of the system. Image resolution parameters were also required to match the preprocessing pipeline used during training, guaranteeing consistency between training and inference inputs. Finally, the path to the trained model file was provided as a parameter, allowing the inference node to load the appropriate network weights at initialization.
+In addition to the vehicle specific parameters retrieved at startup, the `autopilot` node relied on other configuration parameters to define its runtime behavior and data interfaces. These included the names of the ROS 2 topics used to receive camera images and to publish velocity and steering commands, ensuring proper integration with the rest of the system. Image resolution parameters were also required to match the preprocessing pipeline used during training, guaranteeing consistency between training and inference inputs. Finally, the path to the trained model file was provided as a parameter, allowing the inference node to load the appropriate network weights at initialization.
 
 The Autopilot class structure was designed to support real time operation by separating data reception from model execution, while maintaining consistency with the training configuration in terms of preprocessing and network architecture. Camera images were received through a subscriber configured with a **QoS** profile that kept only the most recent message and used best effort reliability. This choice favored low latency over completeness, ensuring that outdated frames were discarded and that the node always processed the freshest available visual information, which is critical for real time vehicle control.
 
@@ -1894,7 +1894,7 @@ To further improve it, inference was performed in a dedicated thread, decoupled 
 
 Within the inference pipeline, incoming images were converted, preprocessed to match the training setup, and passed through the trained neural network. The resulting normalized predictions were then scaled using the vehicle parameters and published as velocity and steering commands.
 
-The code implementing all of this inference logic was located in **autopilot_neural_network/autopilot_neural_network/autopilot.py**, and is presented next:
+The code implementing all of this inference logic was located in `autopilot_neural_network/autopilot_neural_network/autopilot.py`, and is presented next:
 
 ```python
 import threading
@@ -2106,7 +2106,7 @@ if __name__ == '__main__':
     main()
 ```
 
-Since the **autopilot** node shared several configuration parameters with the **data_collector** node, it was decided to reuse the same configuration file to centralize parameter management and ensure consistency across nodes. As a result, the existing configuration file located at **autopilot_neural_network/config/parameters.yaml** was extended to include the additional parameters required by the Autopilot node. The updated version of this file, reflecting the newly added parameters, is shown next:
+Since the `autopilot` node shared several configuration parameters with the `data_collector` node, it was decided to reuse the same configuration file to centralize parameter management and ensure consistency across nodes. As a result, the existing configuration file located at `autopilot_neural_network/config/parameters.yaml` was extended to include the additional parameters required by the Autopilot node. The updated version of this file, reflecting the newly added parameters, is shown next:
 
 ```yaml
 /**:
@@ -2133,9 +2133,9 @@ Since the **autopilot** node shared several configuration parameters with the **
     model_path: "/tmp/autopilot_neural_network/model.pt" # Path to the trained model for inference
 ```
 
-As told before, the parameters in this configuration file must be adapted to the specific setup being used. In particular, **model_path** parameters should be updated to reflect the model location, pointing to the current file generated during training to ensure that the inference node loads the correct trained network.
+As told before, the parameters in this configuration file must be adapted to the specific setup being used. In particular, `model_path` parameters should be updated to reflect the model location, pointing to the current file generated during training to ensure that the inference node loads the correct trained network.
 
-To integrate the inference node into the system, a launch file was created to start the **autopilot** node and load the shared parameters at runtime, ensuring that all required parameters were available as soon as the node was initialized. This launch file was placed in the **autopilot_neural_network/launch** directory under the name **autopilot.launch.py**, and its implementation is shown next:
+To integrate the inference node into the system, a launch file was created to start the `autopilot` node and load the shared parameters at runtime, ensuring that all required parameters were available as soon as the node was initialized. This launch file was placed in the `autopilot_neural_network/launch` directory under the name `autopilot.launch.py`, and its implementation is shown next:
 
 ```python
 import os
@@ -2165,7 +2165,7 @@ def generate_launch_description():
     return LaunchDescription([autopilot_node])
 ```
 
-Finally, the **autopilot_neural_network/setup.py** file was updated to register the **autopilot** node within the package. This change ensured that the node could be executed as a console script and that the associated launch and configuration files were correctly installed and made available at runtime through the package share directory. The updated **setup.py** file is shown below:
+Finally, the `autopilot_neural_network/setup.py` file was updated to register the `autopilot` node within the package. This change ensured that the node could be executed as a console script and that the associated launch and configuration files were correctly installed and made available at runtime through the package share directory. The updated `setup.py` file is shown below:
 
 ```python
 from setuptools import setup, find_packages
@@ -2206,7 +2206,7 @@ setup(
 )
 ```
 
-At this stage, the **autopilot_neural_network** package was complete, integrating data collection, model training, and real-time inference to drive the vehicle simulation autonomously. With the full package implemented, the next step was to build the package. The process began by sourcing the environment, after which the package was compiled using **colcon build**, making it ready for execution within the ROS 2 workspace. These steps are illustrated by the command lines shown below.
+At this stage, the `autopilot_neural_network` package was complete, integrating data collection, model training, and real-time inference to drive the vehicle simulation autonomously. With the full package implemented, the next step was to build the package. The process began by sourcing the environment, after which the package was compiled using `colcon build`, making it ready for execution within the ROS 2 workspace. These steps are illustrated by the command lines shown below.
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -2220,7 +2220,7 @@ source install/setup.bash
 colcon build
 ```
 
-After the package was successfully built, running the inference node required starting the simulation environment first. This was done by launching the vehicle simulation through the **vehicle.launch.py** file, which initialized the Gazebo world and the vehicle controller, with the commands shown below:
+After the package was successfully built, running the inference node required starting the simulation environment first. This was done by launching the vehicle simulation through the `vehicle.launch.py` file, which initialized the Gazebo world and the vehicle controller, with the commands shown below:
 
 ```bash
 source /opt/ros/jazzy/setup.bash 
@@ -2249,7 +2249,7 @@ source install/setup.bash
 ros2 launch autopilot_neural_network autopilot.launch.py
 ```
 
-Once launched, the autopilot node began publishing velocity and steering commands to the **vehicle_controller** node, successfully controlling the vehicle in real time and enabling it to navigate the simulation environment autonomously.
+Once launched, the autopilot node began publishing velocity and steering commands to the `vehicle_controller` node, successfully controlling the vehicle in real time and enabling it to navigate the simulation environment autonomously.
 
 ![Autonomous driving simulation]({{ site.url }}{{ site.baseurl }}/public/images/autonomous-driving-vehicle-simulation/autonomous-driving-simulation.gif)
 *Figure 4 — Autonomous driving simulation.*
@@ -2261,7 +2261,7 @@ The training process showed stable convergence, with both training and validatio
 ![Training and validation loss]({{ site.url }}{{ site.baseurl }}/public/images/autonomous-driving-vehicle-simulation/training-and-validation-loss.webp)
 *Figure 5 — Training and validation loss.*
 
-After completing the training process and integrating the neural network into the inference pipeline, the model’s performance was evaluated in simulation. The primary evaluation was conducted on the **grass_track.sdf** world, which was excluded from the training dataset and therefore had never been seen by the model. This setup allowed the evaluation of the model’s ability to generalize to unseen environments with different visual characteristics. During evaluation, the vehicle was able to autonomously drive the entire track multiple times without leaving the lane, demonstrating that the model successfully learned the driving task and generalized well to unseen conditions.
+After completing the training process and integrating the neural network into the inference pipeline, the model’s performance was evaluated in simulation. The primary evaluation was conducted on the `grass_track.sdf` world, which was excluded from the training dataset and therefore had never been seen by the model. This setup allowed the evaluation of the model’s ability to generalize to unseen environments with different visual characteristics. During evaluation, the vehicle was able to autonomously drive the entire track multiple times without leaving the lane, demonstrating that the model successfully learned the driving task and generalized well to unseen conditions.
 
 ![Autonomous driving evaluation]({{ site.url }}{{ site.baseurl }}/public/images/autonomous-driving-vehicle-simulation/autonomous-driving-evaluation.gif)
 *Figure 6 — Autonomous driving evaluation.*
